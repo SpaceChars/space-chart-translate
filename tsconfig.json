@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": false,
+        "outDir": "dist",
+        "declaration": true,
+        "declarationDir": "./types",
+        "moduleResolution": "Node",
+        "types": ["node"],
+        "esModuleInterop": true
+    },
+    "include": ["index.ts", "test/index.ts"]
+}
