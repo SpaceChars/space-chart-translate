@@ -1,4 +1,4 @@
-import * as http from 'stream-http'
+import http, { Agent } from 'http'
 import { Buffer } from 'buffer'
 /**
  * 请求方法
@@ -21,7 +21,7 @@ export interface HttpClientRequestOption extends HttpClientRequestDefaultOption 
   headers?: { [name: string]: string }
   params?: any
   data?: any,
-  agent?: any
+  agent?: Agent
 }
 
 /**
