@@ -1,4 +1,4 @@
-import { TranslateEngine, TranslateConfigDefaultOption, TranslateLang } from '../core/index';
+import TranslateEngine, { TranslateConfigDefaultOption, TranslateLang } from '../../lib/core/index';
 
 class TranslateVuePlugin {
 
@@ -20,7 +20,9 @@ class TranslateVuePlugin {
 
 
 export default {
-  install(app:any, options: TranslateConfigDefaultOption) {
+  install(app: any, options: TranslateConfigDefaultOption) {
+
+    console.log('----xhr', typeof XMLHttpRequest !== 'undefined');
 
     const plugin = new TranslateVuePlugin(options)
 

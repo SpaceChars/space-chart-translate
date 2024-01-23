@@ -1,8 +1,4 @@
-import { TranslateEngine } from './src/core/index';
 
-import VuePlugin from './src/vue/index'
+import Translate from './lib/core/translate'
 
-export const TransplateVuePlugin = VuePlugin;
-
-
-export default TranslateEngine
+export default Translate

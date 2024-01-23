@@ -1,9 +1,9 @@
 import Vue from "vue";
 import App from "./App.vue";
-import { TransplateVuePlugin } from "@space-chart/translate";
+import translate from "@space-chart/translate";
 
 Vue.config.productionTip = false;
-Vue.use(TransplateVuePlugin, {});
+Vue.use(translate.TransplateVuePlugin, {});
 
 new Vue({
     render: (h) => h(App)

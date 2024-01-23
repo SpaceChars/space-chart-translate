@@ -1,9 +1,5 @@
-
 // import { TranslateLang } from '../lib/core'
 // import TranslateEngine from '../index'
-
-
-
 // const map = {
 //   'ZH-EN': [
 //     {
@@ -12,7 +8,6 @@
 //     }
 //   ]
 // }
-
 // const translate = new TranslateEngine({
 //   src: TranslateLang.ZH,
 //   target: TranslateLang.EN,
@@ -20,7 +15,6 @@
 //   langMap: map
 //   // timeout: 1000
 // })
-
 // translate.translate([
 //   {
 //     id: 1,
@@ -41,12 +35,7 @@
 // }).catch((error) => {
 //   console.error('---error', error)
 // });
-
-let a = 0;
-
-a ??= 1
-
+var a = 0;
+a ??= 1;
 console.log(a);
-
-
-console.log('----xhr', typeof XMLHttpRequest !== 'undefined');
+console.log("----xhr", typeof XMLHttpRequest !== "undefined");

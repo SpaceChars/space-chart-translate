@@ -1,18 +1,18 @@
 {
     "compilerOptions": {
-        "module": "CommonJS",
-        "noImplicitAny":false,
+        "module": "ESNext",
+        "strict": true,
+        "allowJs": true,
+        "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "sourceMap": false,
+        "sourceMap": true,
         "declaration": true,
-        "declarationDir": "./dist/types",
-        "moduleResolution": "Node",
-        "types": ["node"],
+        "declarationDir": "./types",
+        "lib": ["ES2015", "DOM"],
         "esModuleInterop": true,
-        "outDir": "dist",
-        "allowJs": true
+        "outDir": "dist"
     },
-    "include": ["index.ts", "test/index.ts"],
-    "exclude": ["example/**"]
+    "include": ["index.ts"],
+    "exclude": ["node_modules/**", "example/**"]
 }

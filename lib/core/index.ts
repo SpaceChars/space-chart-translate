@@ -1,5 +1,6 @@
 
-import HttpClient, { HtptClientResponseOption, HttpClientInstance } from '../util/api'
+import HttpClient, { HttpClientInstance } from '../http/adapter'
+import { HtptClientResponseOption } from '../http/adapterType'
 
 /**
  * 翻译语言
@@ -60,7 +61,7 @@ export interface ITranslateEngine {
 /**
  * 翻译引擎
  */
-export class TranslateEngine implements ITranslateEngine {
+export default class TranslateEngine implements ITranslateEngine {
 
   private src;
   private target;
@@ -133,7 +134,7 @@ export class TranslateEngine implements ITranslateEngine {
 
       const lang = key.split('-');
 
-      //获取目标语言中的本地语言映射表
+      //获取目标语言中的本地语言映射表，并根据
       const targetLangMapInfo = (this.langMap[key] || []).sort((v1, v2) => {
         const width1 = v1.weight == undefined ? 0 : v1.weight
         const width2 = v2.weight == undefined ? 0 : v2.weight
@@ -159,13 +160,13 @@ export class TranslateEngine implements ITranslateEngine {
         if (res.code == 200) {
           //如果翻译成功，则替换对应目标变量
 
-          res.data = JSON.parse(res.data.data).map((v: string, i: number) => {
+          res.data = JSON.parse(res.data?.data || '[]').map((v: string, i: number) => {
             const info = group[i];
             targetLangMapInfo.forEach((item, index) => {
               v = v.replace('${' + index + '}', item.target)
             })
             return {
-              alternatives: res.data.alternatives,
+              alternatives: (res.data || {}).alternatives || null,
               data: v,
               id: info.id,
               success: true
