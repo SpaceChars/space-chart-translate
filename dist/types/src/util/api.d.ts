@@ -1,5 +1,3 @@
-/// <reference types="node" />
-import { Agent } from 'http';
 export declare enum HttpClientRequestMethod {
     GET = "get",
     POST = "post"
@@ -15,7 +13,7 @@ export interface HttpClientRequestOption extends HttpClientRequestDefaultOption 
     };
     params?: any;
     data?: any;
-    agent?: Agent;
+    agent?: any;
 }
 export interface HtptClientResponseError {
     message?: string;

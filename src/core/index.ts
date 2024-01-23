@@ -1,5 +1,5 @@
 
-import HttpClient, { HtptClientResponseOption, HttpClientInstance } from '../util/http'
+import HttpClient, { HtptClientResponseOption, HttpClientInstance } from '../util/api'
 
 /**
  * 翻译语言
@@ -47,6 +47,7 @@ export interface TranslateResponseOption {
   alternatives: Array<string> | null
   data: string
   id: string | number
+  success: Boolean
 }
 
 /**
@@ -139,13 +140,8 @@ export class TranslateEngine implements ITranslateEngine {
         return width2 - width1;
       })
 
-      console.log('------group-before', JSON.stringify(translateGroup[key]));
-
       //标记后的数据
       const group = translateGroup[key].map(item => this.translateMapping(targetLangMapInfo, item))
-
-      console.log('------group-after', JSON.stringify(group));
-
 
       let translateSrcText = JSON.stringify(group.map(item => item.text));
 
@@ -159,7 +155,6 @@ export class TranslateEngine implements ITranslateEngine {
           'Authorization': 'Bearer deeplx'
         }
       }).then((res) => {
-        console.log('---success', translateSrcText, JSON.stringify(group));
 
         if (res.code == 200) {
           //如果翻译成功，则替换对应目标变量
@@ -172,7 +167,8 @@ export class TranslateEngine implements ITranslateEngine {
             return {
               alternatives: res.data.alternatives,
               data: v,
-              id: info.id
+              id: info.id,
+              success: true
             }
           })
         } else {
@@ -181,7 +177,8 @@ export class TranslateEngine implements ITranslateEngine {
             return {
               alternatives: null,
               data: info.text,
-              id: info.id
+              id: info.id,
+              success: false
             }
           }) as any
         }

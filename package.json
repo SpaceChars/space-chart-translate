@@ -1,28 +1,31 @@
 {
-  "name": "@space-chart/translate",
-  "version": "1.0.0",
-  "description": "Space Chart translate",
-  "main": "dist/index.js",
-  "scripts": {
-    "compile": "tsc -w",
-    "test": "node dist/test/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SpaceChars/space-chart-translate.git"
-  },
-  "keywords": [
-    "translate",
-    "space-chart"
-  ],
-  "author": "2388160949@qq.com",
-  "license": "Apache License 2.0",
-  "bugs": {
-    "url": "https://github.com/SpaceChars/space-chart-translate/issues"
-  },
-  "homepage": "https://github.com/SpaceChars/space-chart-translate#readme",
-  "devDependencies": {
-    "@types/node": "^20.11.5",
-    "typescript": "^5.3.3"
-  }
+    "name": "@space-chart/translate",
+    "version": "1.0.0",
+    "description": "Space Chart translate",
+    "main": "./dist/index.js",
+    "scripts": {
+        "compile": "tsc -w",
+        "test": "node dist/test/index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SpaceChars/space-chart-translate.git"
+    },
+    "keywords": [
+        "translate",
+        "space-chart"
+    ],
+    "author": "2388160949@qq.com",
+    "license": "Apache License 2.0",
+    "bugs": {
+        "url": "https://github.com/SpaceChars/space-chart-translate/issues"
+    },
+    "homepage": "https://github.com/SpaceChars/space-chart-translate#readme",
+    "devDependencies": {
+        "@types/node": "^20.11.5",
+        "typescript": "^5.3.3"
+    },
+    "dependencies": {
+        "stream-http": "^3.2.0"
+    }
 }

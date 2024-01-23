@@ -20,7 +20,7 @@ class TranslateVuePlugin {
 
 
 export default {
-  install(app, options: TranslateConfigDefaultOption) {
+  install(app:any, options: TranslateConfigDefaultOption) {
 
     const plugin = new TranslateVuePlugin(options)
 

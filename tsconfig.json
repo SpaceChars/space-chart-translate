@@ -1,16 +1,18 @@
 {
     "compilerOptions": {
         "module": "CommonJS",
-        "noImplicitAny": true,
+        "noImplicitAny":false,
         "removeComments": true,
         "preserveConstEnums": true,
         "sourceMap": false,
-        "outDir": "dist",
         "declaration": true,
-        "declarationDir": "./types",
+        "declarationDir": "./dist/types",
         "moduleResolution": "Node",
         "types": ["node"],
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "outDir": "dist",
+        "allowJs": true
     },
-    "include": ["index.ts", "test/index.ts"]
+    "include": ["index.ts", "test/index.ts"],
+    "exclude": ["example/**"]
 }

@@ -33,7 +33,9 @@ translate.translate([
         target: core_1.TranslateLang.EN
     }
 ]).then(function (res) {
-    console.log('----res', JSON.stringify(res));
+    res.forEach(function (item) {
+        console.log('----res', item.data);
+    });
 }).catch(function (error) {
-    console.error(error);
+    console.error('---error', error);
 });

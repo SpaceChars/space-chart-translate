@@ -1,5 +1,5 @@
-import http, { Agent } from 'http'
-import { Buffer } from 'node:buffer'
+import * as http from 'stream-http'
+import { Buffer } from 'buffer'
 /**
  * 请求方法
  */
@@ -21,7 +21,7 @@ export interface HttpClientRequestOption extends HttpClientRequestDefaultOption 
   headers?: { [name: string]: string }
   params?: any
   data?: any,
-  agent?: Agent
+  agent?: any
 }
 
 /**
@@ -69,13 +69,13 @@ function send<T>(options: HttpClientRequestOption): Promise<HtptClientResponseOp
     //创建请求示例
     const _h = http.request(
       _options,
-      (res) => {
+      (res: any) => {
         //设置响应编码
         res.setEncoding('utf8');
 
         //监听数据响应
         let _data: any;
-        res.on('data', (chunk) => {
+        res.on('data', (chunk: any) => {
 
           if (!_data) return _data = chunk;
           _data instanceof Buffer ? (_data.includes(chunk)) : (_data += chunk)
@@ -85,7 +85,7 @@ function send<T>(options: HttpClientRequestOption): Promise<HtptClientResponseOp
         //监听响应结束
         res.on('end', () => {
 
-          if (res.headers['content-type'].indexOf('application/json') >= 0) _data = JSON.parse(_data.toString() || '')
+          if ((res.headers['content-type'] || '').indexOf('application/json') >= 0) _data = JSON.parse(_data.toString() || '')
 
           resolve({
             code: res.statusCode || 500,
@@ -99,7 +99,7 @@ function send<T>(options: HttpClientRequestOption): Promise<HtptClientResponseOp
     );
 
     //错误拦截
-    _h.on('error', (e) => {
+    _h.on('error', (e: any) => {
       reject({
         message: e.message
       })

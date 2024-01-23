@@ -35,7 +35,9 @@ translate.translate([
     target: TranslateLang.EN
   }
 ]).then((res) => {
-  console.log('----res', JSON.stringify(res))
+  res.forEach(item => {
+    console.log('----res', item.data)
+  })
 }).catch((error) => {
-  console.error(error)
+  console.error('---error', error)
 });

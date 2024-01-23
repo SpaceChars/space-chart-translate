@@ -1,4 +1,4 @@
-import { HtptClientResponseOption } from '../util/http';
+import { HtptClientResponseOption } from '../util/api';
 export declare enum TranslateLang {
     ZH = "ZH",
     EN = "EN"
@@ -27,6 +27,7 @@ export interface TranslateResponseOption {
     alternatives: Array<string> | null;
     data: string;
     id: string | number;
+    success: Boolean;
 }
 export interface ITranslateEngine {
     translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<Array<HtptClientResponseOption<TranslateResponseOption>>>;

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TranslateEngine = exports.TranslateLang = void 0;
-var http_1 = __importDefault(require("../util/http"));
+var api_1 = __importDefault(require("../util/api"));
 var TranslateLang;
 (function (TranslateLang) {
     TranslateLang["ZH"] = "ZH";
@@ -19,7 +19,7 @@ var TranslateEngine = (function () {
         this.target = options.target || TranslateLang.EN;
         this.langMap = options.langMap || {};
         this.host = options.host;
-        this.http = http_1.default.create({
+        this.http = api_1.default.create({
             timeout: options.timeout
         });
     }
@@ -51,9 +51,7 @@ var TranslateEngine = (function () {
                 var width2 = v2.weight == undefined ? 0 : v2.weight;
                 return width2 - width1;
             });
-            console.log('------group-before', JSON.stringify(translateGroup[key]));
             var group = translateGroup[key].map(function (item) { return _this.translateMapping(targetLangMapInfo, item); });
-            console.log('------group-after', JSON.stringify(group));
             var translateSrcText = JSON.stringify(group.map(function (item) { return item.text; }));
             return _this.http.post(_this.host + '/translate', {
                 "text": translateSrcText,
@@ -64,7 +62,6 @@ var TranslateEngine = (function () {
                     'Authorization': 'Bearer deeplx'
                 }
             }).then(function (res) {
-                console.log('---success', translateSrcText, JSON.stringify(group));
                 if (res.code == 200) {
                     res.data = JSON.parse(res.data.data).map(function (v, i) {
                         var info = group[i];
@@ -74,7 +71,8 @@ var TranslateEngine = (function () {
                         return {
                             alternatives: res.data.alternatives,
                             data: v,
-                            id: info.id
+                            id: info.id,
+                            success: true
                         };
                     });
                 }
@@ -83,7 +81,8 @@ var TranslateEngine = (function () {
                         return {
                             alternatives: null,
                             data: info.text,
-                            id: info.id
+                            id: info.id,
+                            success: false
                         };
                     });
                 }
