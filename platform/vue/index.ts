@@ -1,4 +1,4 @@
-import TranslateEngine, { TranslateConfigDefaultOption, TranslateLang } from '../../lib/core/index';
+import { TranslateEngine, TranslateConfigDefaultOption, TranslateLang } from '../../lib/core/engine';
 
 class TranslateVuePlugin {
 

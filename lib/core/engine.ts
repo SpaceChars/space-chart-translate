@@ -61,7 +61,7 @@ export interface ITranslateEngine {
 /**
  * 翻译引擎
  */
-export default class TranslateEngine implements ITranslateEngine {
+export class TranslateEngine implements ITranslateEngine {
 
   private src;
   private target;
@@ -192,3 +192,5 @@ export default class TranslateEngine implements ITranslateEngine {
   }
 
 }
+
+export default TranslateEngine

@@ -1,18 +1,9 @@
 {
     "compilerOptions": {
         "module": "ESNext",
+        "lib": ["dom", "es2015"],
+        "types": ["node"],
         "strict": true,
-        "allowJs": true,
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": true,
-        "declaration": true,
-        "declarationDir": "./types",
-        "lib": ["ES2015", "DOM"],
-        "esModuleInterop": true,
-        "outDir": "dist"
-    },
-    "include": ["index.ts"],
-    "exclude": ["node_modules/**", "example/**"]
+        "noEmit": true
+    }
 }

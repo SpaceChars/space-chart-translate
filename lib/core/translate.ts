@@ -1,9 +1,10 @@
-import TranslateEngine from './index';
+import { TranslateEngine } from './engine';
 
-import { TransplateVuePlugin } from '../../platform/index'
+import TranslateVuePlugin from '../../platform/vue/index'
 
-const _a = {
+const Translate = {
   TranslateEngine,
-  TransplateVuePlugin
+  TranslateVuePlugin
 }
-export default _a
+
+export default Translate
