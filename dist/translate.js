@@ -10,9 +10,7 @@
         }
         XHRAdapter.prototype.send = function (options) {
             return new Promise(function (resolve, reject) {
-                reject({
-                    message: '1111'
-                });
+                reject({});
             });
         };
         return XHRAdapter;
@@ -6809,15 +6807,6 @@
       return req
     }
 
-    /**
-     * 请求方法
-     */
-    var HttpClientRequestMethod;
-    (function (HttpClientRequestMethod) {
-        HttpClientRequestMethod["GET"] = "get";
-        HttpClientRequestMethod["POST"] = "post";
-    })(HttpClientRequestMethod || (HttpClientRequestMethod = {}));
-
     var NodeHttpAdapter = /** @class */ (function () {
         function NodeHttpAdapter() {
         }
@@ -6887,6 +6876,14 @@
         return NodeHttpAdapter;
     }());
 
+    /**
+     * 请求方法
+     */
+    var HttpClientRequestMethod;
+    (function (HttpClientRequestMethod) {
+        HttpClientRequestMethod["GET"] = "get";
+        HttpClientRequestMethod["POST"] = "post";
+    })(HttpClientRequestMethod || (HttpClientRequestMethod = {}));
     var HttpClientInstance = /** @class */ (function () {
         function HttpClientInstance(options) {
             this.defaultOption = options;
@@ -7058,3 +7055,4 @@
     return Translate;
 
 }));
+//# sourceMappingURL=translate.js.map

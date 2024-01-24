@@ -1,6 +1,6 @@
 import * as http from 'http'
 import { Buffer } from 'buffer';
-import { HtptClientResponseOption, HttpClientRequestMethod, HttpClientRequestOption, IHttpAdapter } from './adapterType';
+import { HtptClientResponseOption, HttpClientRequestMethod, HttpClientRequestOption, IHttpAdapter } from './adapter';
 
 export default class NodeHttpAdapter implements IHttpAdapter {
 

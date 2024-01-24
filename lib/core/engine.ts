@@ -1,6 +1,5 @@
 
-import HttpClient, { HttpClientInstance } from '../http/adapter'
-import { HtptClientResponseOption } from '../http/adapterType'
+import HttpClient, { HtptClientResponseOption, HttpClientInstance } from '../http/adapter'
 
 /**
  * 翻译语言

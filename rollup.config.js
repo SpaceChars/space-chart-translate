@@ -16,6 +16,13 @@ const defaultInput = "./lib/core/translate.ts";
 
 const pkg = require("./package.json");
 
+const tsPlugins = [
+    typescript({
+        tslib: require.resolve("tslib")
+    }),
+    nodePolyfills({ include: ["http*", "buffer*"] })
+];
+
 const buildConfig = ({ es5, browser = true, minifiedVersion = true, ...config }) => {
     const { file } = config.output;
     const ext = path.extname(file);
@@ -34,8 +41,7 @@ const buildConfig = ({ es5, browser = true, minifiedVersion = true, ...config })
             ).join(".")}`
         },
         plugins: [
-            typescript(),
-            nodePolyfills({ include: ["http*", "buffer*"] }),
+            ...tsPlugins,
             json(),
             resolve({ browser }),
             commonjs(),
@@ -117,7 +123,7 @@ export default async () => {
                 exports: "default",
                 banner
             },
-            plugins: [autoExternal(), resolve(), commonjs()]
+            plugins: [...tsPlugins, autoExternal(), resolve(), commonjs()]
         }
     ];
 };

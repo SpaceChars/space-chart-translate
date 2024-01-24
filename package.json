@@ -2,16 +2,29 @@
     "name": "@space-chart/translate",
     "version": "1.0.0",
     "description": "Space Chart translate",
-    "main": "./index.js",
-    "types": "./types/index.d.ts",
+    "main": "./dist/translate.js",
     "type": "module",
+    "exports": {
+        ".": {
+            "browser": {
+                "require": "./dist/browser/translate.cjs",
+                "default": "./dist/esm/translate.js"
+            },
+            "default": {
+                "require": "./dist/node/translate.cjs",
+                "default": "./dist/esm/translate.js"
+            }
+        }
+    },
     "devDependencies": {
+        "@babel/preset-env": "^7.23.8",
         "@rollup/plugin-babel": "^6.0.4",
         "@rollup/plugin-commonjs": "^25.0.7",
         "@rollup/plugin-json": "^6.1.0",
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-typescript": "^11.1.6",
         "@types/node": "^20.11.5",
+        "cross-env": "^7.0.3",
         "rollup": "^2.79.1",
         "rollup-plugin-auto-external": "^2.0.0",
         "rollup-plugin-bundle-size": "^1.0.3",
@@ -22,7 +35,7 @@
     },
     "scripts": {
         "compile": "tsc -w",
-        "compile:rollup": "rm -fr dist && rollup -c",
+        "compile:rollup": "rm -fr dist && cross-env NODE_ENV=production rollup -c -m",
         "test": "tsc test/index.ts && node dist/test/index.js"
     },
     "repository": {
@@ -34,7 +47,7 @@
         "space-chart"
     ],
     "author": "2388160949@qq.com",
-    "license": "Apache License 2.0",
+    "license": "Apache-2.0",
     "bugs": {
         "url": "https://github.com/SpaceChars/space-chart-translate/issues"
     },
