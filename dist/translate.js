@@ -7004,6 +7004,7 @@
         TranslateVuePlugin.prototype.translateVUE2 = function () {
             return {
                 bind: function (el, binding, vnode, prevVnode) {
+                    console.log('----vue2-bind', el, binding, vnode, prevVnode);
                 },
                 inserted: function () {
                 },
@@ -7042,7 +7043,6 @@
     }());
     var TranslateVuePlugin$1 = {
         install: function (app, options) {
-            console.log('----xhr', typeof XMLHttpRequest !== 'undefined');
             var plugin = new TranslateVuePlugin(options);
             var version = Number(app.version.split('.')[0]);
             if (version < 3) {

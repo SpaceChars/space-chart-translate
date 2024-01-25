@@ -4,6 +4,6 @@
         "lib": ["DOM", "ES2015"],
         "types": ["node"],
         "strict": true,
-        "noEmit": true
+        "noEmit": true,
     }
 }
