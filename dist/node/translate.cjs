@@ -1,4 +1,4 @@
-// @space-chart/translate  v1.0.0 Copyright (c) 2024 2388160949@qq.com and contributors
+// @spacechart/translate  v1.0.0 Copyright (c) 2024 2388160949@qq.com and contributors
 'use strict';
 
 const http = require('http');
@@ -123,7 +123,7 @@ var HttpClientInstance = /** @class */ (function () {
         return this.request(Object.assign(this.defaultOption, options, { url: url, method: HttpClientRequestMethod.POST, data: data }));
     };
     HttpClientInstance.prototype.request = function (options) {
-        var adapter = typeof XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
+        var adapter = typeof window.XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
         return adapter.send(Object.assign(this.defaultOption, options));
     };
     return HttpClientInstance;
@@ -256,8 +256,41 @@ var TranslateVuePlugin = /** @class */ (function () {
         this.engine = new TranslateEngine(options);
     }
     TranslateVuePlugin.prototype.translateVUE2 = function () {
+        return {
+            bind: function (el, binding, vnode, prevVnode) {
+            },
+            inserted: function () {
+            },
+            update: function () {
+            },
+            componentUpdated: function () {
+            },
+            unbind: function () {
+            }
+        };
     };
     TranslateVuePlugin.prototype.translateVUE3 = function () {
+        return {
+            // 在绑定元素的 attribute 前
+            // 或事件监听器应用前调用
+            created: function (el, binding, vnode, prevVnode) {
+                // 下面会介绍各个参数的细节
+            },
+            // 在元素被插入到 DOM 前调用
+            beforeMount: function (el, binding, vnode, prevVnode) { },
+            // 在绑定元素的父组件
+            // 及他自己的所有子节点都挂载完成后调用
+            mounted: function (el, binding, vnode, prevVnode) { },
+            // 绑定元素的父组件更新前调用
+            beforeUpdate: function (el, binding, vnode, prevVnode) { },
+            // 在绑定元素的父组件
+            // 及他自己的所有子节点都更新后调用
+            updated: function (el, binding, vnode, prevVnode) { },
+            // 绑定元素的父组件卸载前调用
+            beforeUnmount: function (el, binding, vnode, prevVnode) { },
+            // 绑定元素的父组件卸载后调用
+            unmounted: function (el, binding, vnode, prevVnode) { }
+        };
     };
     return TranslateVuePlugin;
 }());
@@ -267,9 +300,11 @@ const TranslateVuePlugin$1 = {
         var plugin = new TranslateVuePlugin(options);
         var version = Number(app.version.split('.')[0]);
         if (version < 3) {
+            app.directive('translate', plugin.translateVUE2());
             app.prototype.$translate = plugin.translateVUE2;
         }
         else {
+            app.directive('translate', plugin.translateVUE3());
             app.config.globalProperties.$translate = plugin.translateVUE3;
         }
     }

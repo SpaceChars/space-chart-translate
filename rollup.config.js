@@ -8,6 +8,7 @@ import autoExternal from "rollup-plugin-auto-external";
 import bundleSize from "rollup-plugin-bundle-size";
 import { terser } from "rollup-plugin-terser";
 import path from "path";
+import { dts } from "rollup-plugin-dts";
 
 const name = "translate";
 
@@ -20,7 +21,7 @@ const tsPlugins = [
     typescript({
         tslib: require.resolve("tslib")
     }),
-    nodePolyfills({ include: ["http*", "buffer*"] })
+    nodePolyfills()
 ];
 
 const buildConfig = ({ es5, browser = true, minifiedVersion = true, ...config }) => {
@@ -69,9 +70,9 @@ const buildConfig = ({ es5, browser = true, minifiedVersion = true, ...config })
 };
 
 export default async () => {
-    const banner = `// @space-chart/translate  v${
-        pkg.version
-    } Copyright (c) ${new Date().getFullYear()} ${pkg.author} and contributors`;
+    const banner = `// ${pkg.name}  v${pkg.version} Copyright (c) ${new Date().getFullYear()} ${
+        pkg.author
+    } and contributors`;
 
     return [
         // browser ESM bundle for CDN
@@ -79,7 +80,7 @@ export default async () => {
             input: namedInput,
             output: {
                 file: `dist/esm/${name}.js`,
-                format: "esm",
+                format: "es",
                 preferConst: true,
                 exports: "named",
                 banner
@@ -124,6 +125,15 @@ export default async () => {
                 banner
             },
             plugins: [...tsPlugins, autoExternal(), resolve(), commonjs()]
+        },
+        //Browser ESM bundle for TypeScript declaration
+        {
+            input: namedInput,
+            output: {
+                format: "es",
+                file: "dist/index.d.ts"
+            },
+            plugins: [dts()]
         }
     ];
 };
