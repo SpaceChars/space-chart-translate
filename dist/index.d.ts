@@ -1,28 +1,14 @@
 /**
- * 错误响应属性
- */
-interface HtptClientResponseError {
-    message?: string;
-    code?: number | string;
-}
-/**
- * 正常响应属性
- */
-interface HtptClientResponseOption<T> extends HtptClientResponseError {
-    data: T | null;
-}
-
-/**
  * 翻译语言
  */
-declare enum TranslateLang {
+declare enum TranslationLanguage$1 {
     ZH = "ZH",
     EN = "EN"
 }
 /**
  * 语言词典库——单项词典信息
  */
-interface LangMapItemInfo {
+interface LanguageMapItemInfo {
     src: string;
     target: string;
     weight?: number;
@@ -30,21 +16,22 @@ interface LangMapItemInfo {
 /**
  * 默认翻译语言配置
  */
-interface TranslateConfigLangDefaultOption {
-    src: TranslateLang | string;
-    target: TranslateLang | string;
-    langMap?: {
-        [name: TranslateLang | string]: Array<LangMapItemInfo>;
+interface TranslateConfigLanguageDefaultOption {
+    src: TranslationLanguage$1 | string;
+    target: TranslationLanguage$1 | string;
+    languageMap?: {
+        [name: TranslationLanguage | string]: Array<LanguageMapItemInfo>;
     };
 }
-interface TranslateConfigDefaultOption extends TranslateConfigLangDefaultOption {
+interface TranslateConfigDefaultOption extends TranslateConfigLanguageDefaultOption {
     host: string;
+    authorization: string;
     timeout?: number;
 }
 /**
  * 翻译配置
  */
-interface TranslateConfigOption extends TranslateConfigLangDefaultOption {
+interface TranslateConfigOption extends TranslateConfigLanguageDefaultOption {
     text?: string;
     id: string | number;
 }
@@ -61,7 +48,7 @@ interface TranslateResponseOption {
  * 翻译引擎接口类
  */
 interface ITranslateEngine {
-    translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<Array<HtptClientResponseOption<TranslateResponseOption>>>;
+    translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<TranslateResponseOption> | Promise<Array<TranslateResponseOption>>;
 }
 /**
  * 翻译引擎
@@ -69,23 +56,63 @@ interface ITranslateEngine {
 declare class TranslateEngine$1 implements ITranslateEngine {
     private src;
     private target;
-    private langMap;
+    private languageMap;
     private host;
+    private authorization;
     private http;
     constructor(options: TranslateConfigDefaultOption);
     /**
-     * 映射本地语言表
-     * @param targetLang
+     * 根据配置信息获取本地语言映射表映射标识
+     * @param options 配置信息
+     * @returns
+     */
+    private getLocalTranslateLanguageMapKeyByOption;
+    /**
+     * 根据key获取本地语言映射表信息
+     * @param key 映射标识 格式：[srcource language]-[target language]
+     * @returns
+     */
+    private getLocalTranslateLanguageMapInfoByKey;
+    /**
+     * 发送翻译请求
+     * @param text 需要翻译的文本
+     * @param src 源语言
+     * @param target 目标语言
+     * @returns
+     */
+    private requestTranslate;
+    /**
+     * 根据本地语言映射表标记原始文本
+     * @param localLanguageMapInfo
      * @param info
      * @returns
      */
-    translateMapping(targetLangMapInfo: Array<LangMapItemInfo>, info: TranslateConfigOption): TranslateConfigOption;
+    encodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, info: TranslateConfigOption): TranslateConfigOption;
     /**
-     * 翻译
-     * @param options
+     * 根据本地语言映射表解析翻译结果
+     * @param key 映射标识
+     * @param responseText 翻译响应结果文本
      * @returns
      */
-    translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<HtptClientResponseOption<TranslateResponseOption>[]>;
+    decodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, responseText: string): string;
+    /**
+     * 单个翻译
+     * @param options
+     */
+    singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption>;
+    /**
+     * 批量翻译
+     * @param options
+     */
+    branchTranslate(options: Array<TranslateConfigOption>): Promise<Array<TranslateResponseOption>>;
+    /**
+     *
+     * @param options Translation Configura Option
+     * @returns If options dont instance of array,or options length is one return `Pormise<TranslateResponseOption>`,
+     * otherwise return `Promise<Array<TranslateResponseOption>>` type
+     *
+     */
+    translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<TranslateResponseOption> | Promise<Array<TranslateResponseOption>>;
 }
 
 declare const Translate: {
@@ -93,12 +120,14 @@ declare const Translate: {
     TranslateVuePlugin: {
         install(app: any, options: TranslateConfigDefaultOption): void;
     };
+    TranslationLanguage: typeof TranslationLanguage$1;
 };
 
 declare const TranslateEngine: typeof TranslateEngine$1;
 declare const TranslateVuePlugin: {
     install(app: any, options: TranslateConfigDefaultOption): void;
 };
+declare const TranslationLanguage: typeof TranslationLanguage$1;
 
-export { TranslateEngine, TranslateVuePlugin, Translate as default };
+export { TranslateEngine, TranslateVuePlugin, TranslationLanguage, Translate as default };
 //# sourceMappingURL=index.d.ts.map

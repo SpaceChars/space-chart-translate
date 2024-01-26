@@ -1,4 +1,4 @@
-import { TranslateEngine, TranslateConfigDefaultOption, TranslateLang } from '../../lib/core/engine';
+import { TranslateEngine, TranslateConfigDefaultOption, TranslationLanguage } from '../../lib/core/engine';
 
 class TranslateVuePlugin {
 
@@ -19,8 +19,8 @@ class TranslateVuePlugin {
       update() {
 
       },
-      componentUpdated() {
-
+      componentUpdated(el: HTMLElement, binding: any, vnode: any, prevVnode: any) {
+        console.log('----vue2-componentUpdated', el, binding, vnode, prevVnode);
       },
       unbind() {
 

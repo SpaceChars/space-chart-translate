@@ -1,9 +1,10 @@
 
 import Translate from './lib/core/translate'
 
-const { TranslateEngine, TranslateVuePlugin } = Translate
+const { TranslateEngine, TranslateVuePlugin, TranslationLanguage } = Translate
 export {
   Translate as default,
   TranslateEngine,
-  TranslateVuePlugin
+  TranslateVuePlugin,
+  TranslationLanguage
 }

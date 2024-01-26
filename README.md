@@ -19,12 +19,13 @@ npm install @spacechart/translate
 ### 配置项目
 
 ```js
-const { TranslateEngine } = require("@spacechart/translate");
-const { TranslateLang } = require("@spacechart/translate/lib/core/engine");
+const { TranslateEngine,TranslationLanguage} = require("@spacechart/translate");
 
 const engine = new TranslateEngine({
-    host: "http://xx.xx.com", //deeplx服务地址
-    src: TranslateLang.ZH
+    host: "http://translate.xx.xx",
+    src: TranslationLanguage.ZH,
+    target: TranslationLanguage.EN,
+    authorization: "xx.xx"
 });
 
 engine

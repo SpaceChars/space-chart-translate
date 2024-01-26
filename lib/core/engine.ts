@@ -4,7 +4,7 @@ import HttpClient, { HtptClientResponseOption, HttpClientInstance } from '../htt
 /**
  * 翻译语言
  */
-export enum TranslateLang {
+export enum TranslationLanguage {
   ZH = 'ZH',
   EN = 'EN',
 }
@@ -12,7 +12,7 @@ export enum TranslateLang {
 /**
  * 语言词典库——单项词典信息
  */
-export interface LangMapItemInfo {
+export interface LanguageMapItemInfo {
   src: string
   target: string
   weight?: number
@@ -21,21 +21,22 @@ export interface LangMapItemInfo {
 /**
  * 默认翻译语言配置
  */
-export interface TranslateConfigLangDefaultOption {
-  src: TranslateLang | string
-  target: TranslateLang | string
-  langMap?: { [name: TranslateLang | string]: Array<LangMapItemInfo> }
+export interface TranslateConfigLanguageDefaultOption {
+  src: TranslationLanguage | string
+  target: TranslationLanguage | string
+  languageMap?: { [name: TranslationLanguage | string]: Array<LanguageMapItemInfo> }
 }
 
-export interface TranslateConfigDefaultOption extends TranslateConfigLangDefaultOption {
+export interface TranslateConfigDefaultOption extends TranslateConfigLanguageDefaultOption {
   host: string
+  authorization: string
   timeout?: number
 }
 
 /**
  * 翻译配置
  */
-export interface TranslateConfigOption extends TranslateConfigLangDefaultOption {
+export interface TranslateConfigOption extends TranslateConfigLanguageDefaultOption {
   text?: string
   id: string | number
 }
@@ -54,7 +55,7 @@ export interface TranslateResponseOption {
  * 翻译引擎接口类
  */
 export interface ITranslateEngine {
-  translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<Array<HtptClientResponseOption<TranslateResponseOption>>>;
+  translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<TranslateResponseOption> | Promise<Array<TranslateResponseOption>>;
 }
 
 /**
@@ -64,9 +65,10 @@ export class TranslateEngine implements ITranslateEngine {
 
   private src;
   private target;
-  private langMap;
+  private languageMap;
 
   private host;
+  private authorization;
   private http: HttpClientInstance;
 
   constructor(options: TranslateConfigDefaultOption) {
@@ -75,119 +77,205 @@ export class TranslateEngine implements ITranslateEngine {
       throw new Error('The deeplx host address cannot be emptry')
     }
 
-    this.src = options.src || TranslateLang.ZH
-    this.target = options.target || TranslateLang.EN
-    this.langMap = options.langMap || {}
+    if (!options.authorization) {
+      throw new Error('The deeplx request token cannot be emptry')
+    }
+
+    if (!options.src) {
+      throw new Error('The source language cannot be emptry')
+    }
+
+    if (!options.target) {
+      throw new Error('The target language cannot be emptry')
+    }
+
+    this.src = options.src || TranslationLanguage.ZH
+    this.target = options.target || TranslationLanguage.EN
+    this.languageMap = options.languageMap || {}
 
     this.host = options.host;
+    this.authorization = options.authorization;
     this.http = HttpClient.create({
       timeout: options.timeout
     })
   }
 
   /**
-   * 映射本地语言表
-   * @param targetLang 
+   * 根据配置信息获取本地语言映射表映射标识
+   * @param options 配置信息
+   * @returns 
+   */
+  private getLocalTranslateLanguageMapKeyByOption(options: TranslateConfigOption): string {
+    return `${options.src || this.src}-${options.target || this.target}`;
+  }
+
+  /**
+   * 根据key获取本地语言映射表信息
+   * @param key 映射标识 格式：[srcource language]-[target language]
+   * @returns 
+   */
+  private getLocalTranslateLanguageMapInfoByKey(key: string): Array<LanguageMapItemInfo> {
+    return (this.languageMap[key] || []).sort((v1, v2) => {
+      const width1 = v1.weight == undefined ? 0 : v1.weight
+      const width2 = v2.weight == undefined ? 0 : v2.weight
+      return width2 - width1;
+    })
+  }
+
+  /**
+   * 发送翻译请求
+   * @param text 需要翻译的文本
+   * @param src 源语言
+   * @param target 目标语言
+   * @returns 
+   */
+  private requestTranslate(text: string, src: TranslationLanguage | string, target: TranslationLanguage | string) {
+    return this.http.post<TranslateResponseOption>(this.host + '/translate',
+      {
+        "text": text,
+        "source_language": src || this.src,
+        "target_language": target || this.target
+      }, {
+      headers: {
+        'Authorization': this.authorization
+      }
+    })
+  }
+
+  /**
+   * 根据本地语言映射表标记原始文本
+   * @param localLanguageMapInfo 
    * @param info 
    * @returns 
    */
-  translateMapping(targetLangMapInfo: Array<LangMapItemInfo>, info: TranslateConfigOption): TranslateConfigOption {
+  encodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, info: TranslateConfigOption): TranslateConfigOption {
 
-    //深拷贝，避免数据影响
     info = JSON.parse(JSON.stringify(info));
-
     let text = info.text || '';
-    targetLangMapInfo.forEach((map, index) => {
+
+    localLanguageMapInfo.forEach((map, index) => {
       text = text.replace(map.src, '${' + index + '}')
     })
-    info.text = text;
 
+    info.text = text;
     return info;
   }
 
 
   /**
-   * 翻译
-   * @param options 
+   * 根据本地语言映射表解析翻译结果
+   * @param key 映射标识
+   * @param responseText 翻译响应结果文本
    * @returns 
    */
-  translate(options: TranslateConfigOption | Array<TranslateConfigOption>) {
+  decodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, responseText: string): string {
+    localLanguageMapInfo.forEach((item, index) => {
+      responseText = responseText.replace('${' + index + '}', item.target)
+    })
+    return responseText;
+  }
 
-    if (!(options instanceof Array)) {
-      options = [options]
-    }
+  /**
+   * 单个翻译
+   * @param options 
+   */
+  singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption> {
+    return new Promise((resolve, reject) => {
 
-    // 按源语言和目标语言进行分组
-    const translateGroup: { [name: string]: Array<TranslateConfigOption> } = {};
-    options.forEach((option, index) => {
+      const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(this.getLocalTranslateLanguageMapKeyByOption(options))
 
-      const key = `${option.src || this.src}-${option.target || this.target}`;
-      const info: Array<TranslateConfigOption> = translateGroup[key] || [];
-      info.push(option)
-      translateGroup[key] = info;
+      const _options = this.encodeTranslateMapping(targetLanguageMapInfo, options)
 
+      this.requestTranslate(_options.text || '', _options.src, _options.target).then((res) => {
+        resolve(res.code == 200 ? {
+          alternatives: (res.data || {}).alternatives || null,
+          data: this.decodeTranslateMapping(targetLanguageMapInfo, res.data?.data || ''),
+          id: options.id || '',
+          success: true
+        } : {
+          alternatives: null,
+          data: options.text || '',
+          id: options.id || '',
+          success: false
+        }
+        )
+
+      })
+    })
+  }
+
+  /**
+   * 批量翻译
+   * @param options 
+   */
+  branchTranslate(options: Array<TranslateConfigOption>): Promise<Array<TranslateResponseOption>> {
+
+    return new Promise((resolve, reject) => {
+
+      // 按源语言和目标语言进行分组
+      const translateGroup: { [name: string]: Array<TranslateConfigOption> } = {};
+
+      options.forEach((option, index) => {
+
+        const key = this.getLocalTranslateLanguageMapKeyByOption(option)
+
+        const info: Array<TranslateConfigOption> = translateGroup[key] || [];
+        info.push(option)
+
+        translateGroup[key] = info;
+      })
+
+      //By language group Translate
+      Promise.all(Object.keys(translateGroup).map(key => {
+
+        const language = key.split('-');
+
+        const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(key)
+
+        const encodeTranslateInfo = translateGroup[key].map(item => this.encodeTranslateMapping(targetLanguageMapInfo, item))
+
+        let translateSrcText = JSON.stringify(encodeTranslateInfo.map(item => item.text));
+
+        this.requestTranslate(translateSrcText, language[0], language[1]).then((res) => {
+
+          if (res.code == 200) {
+
+            resolve(JSON.parse(res.data?.data || '[]').map((v: string, i: number) => {
+              const info = encodeTranslateInfo[i];
+              return {
+                alternatives: (res.data || {}).alternatives || null,
+                data: this.decodeTranslateMapping(targetLanguageMapInfo, v),
+                id: info.id,
+                success: true
+              }
+            }))
+          } else {
+            resolve(translateGroup[key].map(info => {
+              return {
+                alternatives: null,
+                data: info.text || '',
+                id: info.id,
+                success: false
+              }
+            })
+            )
+          }
+        })
+      }))
     })
 
-    //按照翻译分组分别进行翻译
-    return Promise.all(Object.keys(translateGroup).map(key => {
-
-      const lang = key.split('-');
-
-      //获取目标语言中的本地语言映射表，并根据
-      const targetLangMapInfo = (this.langMap[key] || []).sort((v1, v2) => {
-        const width1 = v1.weight == undefined ? 0 : v1.weight
-        const width2 = v2.weight == undefined ? 0 : v2.weight
-        return width2 - width1;
-      })
-
-      //标记后的数据
-      const group = translateGroup[key].map(item => this.translateMapping(targetLangMapInfo, item))
-
-      let translateSrcText = JSON.stringify(group.map(item => item.text));
-
-      return this.http.post<TranslateResponseOption>(this.host + '/translate',
-        {
-          "text": translateSrcText,
-          "source_lang": lang[0],
-          "target_lang": lang[1]
-        }, {
-        headers: {
-          'Authorization': 'Bearer deeplx'
-        }
-      }).then((res) => {
-
-        if (res.code == 200) {
-          //如果翻译成功，则替换对应目标变量
-
-          res.data = JSON.parse(res.data?.data || '[]').map((v: string, i: number) => {
-            const info = group[i];
-            targetLangMapInfo.forEach((item, index) => {
-              v = v.replace('${' + index + '}', item.target)
-            })
-            return {
-              alternatives: (res.data || {}).alternatives || null,
-              data: v,
-              id: info.id,
-              success: true
-            }
-          })
-        } else {
-          // 如果翻译失败，则返回原数据
-          res.data = translateGroup[key].map(info => {
-            return {
-              alternatives: null,
-              data: info.text,
-              id: info.id,
-              success: false
-            }
-          }) as any
-        }
-
-        return res
-      })
-    }))
+  }
 
 
+  /**
+   * 
+   * @param options Translation Configura Option
+   * @returns If options dont instance of array,or options length is one return `Pormise<TranslateResponseOption>`,
+   * otherwise return `Promise<Array<TranslateResponseOption>>` type
+   * 
+   */
+  translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<TranslateResponseOption> | Promise<Array<TranslateResponseOption>> {
+    return !(options instanceof Array) ? this.singleTranslate(options) : options.length == 1 ? this.singleTranslate(options[0]) : this.branchTranslate(options)
   }
 
 }
