@@ -1,3 +1,14 @@
-import { TranslateEngine } from './src/core/index';
 
-export default TranslateEngine
+// This module is intended to unwrap Axios default export as named.
+
+import Translate from './lib/core/translate'
+
+const { DeeplxTranslateEngine, DeeplxLanguage, TranslateVuePlugin, TranslateEngineInstance } = Translate
+
+export {
+  Translate as default,
+  DeeplxTranslateEngine,
+  DeeplxLanguage,
+  TranslateVuePlugin,
+  TranslateEngineInstance
+}

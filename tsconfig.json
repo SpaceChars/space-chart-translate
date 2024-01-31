@@ -1,16 +1,11 @@
 {
     "compilerOptions": {
-        "module": "CommonJS",
-        "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": false,
-        "outDir": "dist",
-        "declaration": true,
-        "declarationDir": "./types",
-        "moduleResolution": "Node",
+        "target": "ES2015",
+        "module": "ESNext",
+        "lib": ["DOM", "ES2015", "ES2021.String"],
         "types": ["node"],
-        "esModuleInterop": true
+        "strict": true,
+        "noEmit": true
     },
-    "include": ["index.ts", "test/index.ts"]
+    "exclude": ["test/index.ts"]
 }

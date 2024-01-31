@@ -1,28 +1,60 @@
 {
-  "name": "@space-chart/translate",
-  "version": "1.0.0",
-  "description": "Space Chart translate",
-  "main": "dist/index.js",
-  "scripts": {
-    "compile": "tsc -w",
-    "test": "node dist/test/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SpaceChars/space-chart-translate.git"
-  },
-  "keywords": [
-    "translate",
-    "space-chart"
-  ],
-  "author": "2388160949@qq.com",
-  "license": "Apache License 2.0",
-  "bugs": {
-    "url": "https://github.com/SpaceChars/space-chart-translate/issues"
-  },
-  "homepage": "https://github.com/SpaceChars/space-chart-translate#readme",
-  "devDependencies": {
-    "@types/node": "^20.11.5",
-    "typescript": "^5.3.3"
-  }
+    "name": "@spacechart/translate",
+    "version": "1.0.0",
+    "description": "Space Chart translate",
+    "main": "./dist/esm/translate.js",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": {
+                "default": "./dist/index.d.ts"
+            },
+            "browser": {
+                "require": "./dist/browser/translate.cjs",
+                "default": "./dist/esm/translate.js"
+            },
+            "default": {
+                "require": "./dist/node/translate.cjs",
+                "default": "./dist/esm/translate.js"
+            }
+        }
+    },
+    "scripts": {
+        "installDependencies": "npm install--force",
+        "build": "rm -fr dist && cross-env NODE_ENV=production rollup -c -m",
+        "test": "tsc test/index.ts && node dist/test/index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SpaceChars/space-chart-translate.git"
+    },
+    "keywords": [
+        "translate",
+        "space-chart"
+    ],
+    "author": "2388160949@qq.com",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/SpaceChars/space-chart-translate/issues"
+    },
+    "homepage": "https://github.com/SpaceChars/space-chart-translate#readme",
+    "devDependencies": {
+        "@babel/core": "^7.23.7",
+        "@babel/preset-env": "^7.23.8",
+        "@rollup/plugin-babel": "^6.0.4",
+        "@rollup/plugin-commonjs": "^25.0.7",
+        "@rollup/plugin-json": "^6.1.0",
+        "@rollup/plugin-node-resolve": "^15.2.3",
+        "@rollup/plugin-typescript": "^11.1.6",
+        "@types/node": "^20.11.5",
+        "cross-env": "^7.0.3",
+        "rollup": "^2.79.1",
+        "rollup-plugin-auto-external": "^2.0.0",
+        "rollup-plugin-bundle-size": "^1.0.3",
+        "rollup-plugin-dts": "^6.1.0",
+        "rollup-plugin-polyfill-node": "^0.13.0",
+        "rollup-plugin-terser": "^7.0.2",
+        "tslib": "^2.6.2",
+        "typescript": "^5.3.3"
+    }
 }
