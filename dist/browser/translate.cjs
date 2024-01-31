@@ -1,17 +1,6 @@
 // @spacechart/translate  v1.0.0 Copyright (c) 2024 2388160949@qq.com and contributors
 'use strict';
 
-var XHRAdapter = /** @class */ (function () {
-    function XHRAdapter() {
-    }
-    XHRAdapter.prototype.send = function (options) {
-        return new Promise(function (resolve, reject) {
-            reject({});
-        });
-    };
-    return XHRAdapter;
-}());
-
 var global$1 = (typeof global !== "undefined" ? global :
   typeof self !== "undefined" ? self :
   typeof window !== "undefined" ? window : {});
@@ -2063,7 +2052,7 @@ function runClearTimeout(marker) {
 
 
 }
-var queue = [];
+var queue$1 = [];
 var draining = false;
 var currentQueue;
 var queueIndex = -1;
@@ -2074,11 +2063,11 @@ function cleanUpNextTick() {
     }
     draining = false;
     if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
+        queue$1 = currentQueue.concat(queue$1);
     } else {
         queueIndex = -1;
     }
-    if (queue.length) {
+    if (queue$1.length) {
         drainQueue();
     }
 }
@@ -2090,17 +2079,17 @@ function drainQueue() {
     var timeout = runTimeout(cleanUpNextTick);
     draining = true;
 
-    var len = queue.length;
+    var len = queue$1.length;
     while(len) {
-        currentQueue = queue;
-        queue = [];
+        currentQueue = queue$1;
+        queue$1 = [];
         while (++queueIndex < len) {
             if (currentQueue) {
                 currentQueue[queueIndex].run();
             }
         }
         queueIndex = -1;
-        len = queue.length;
+        len = queue$1.length;
     }
     currentQueue = null;
     draining = false;
@@ -2113,8 +2102,8 @@ function nextTick(fun) {
             args[i - 1] = arguments[i];
         }
     }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
+    queue$1.push(new Item(fun, args));
+    if (queue$1.length === 1 && !draining) {
         runTimeout(drainQueue);
     }
 }
@@ -6777,11 +6766,9 @@ function request(opts, cb) {
   return req
 }
 
-var NodeHttpAdapter = /** @class */ (function () {
-    function NodeHttpAdapter() {
-    }
-    NodeHttpAdapter.prototype.send = function (options) {
-        return new Promise(function (resolve, reject) {
+class NodeHttpAdapter {
+    send(options) {
+        return new Promise((resolve, reject) => {
             if (!options.url) {
                 return reject({
                     mesage: 'The request url is empty'
@@ -6792,26 +6779,26 @@ var NodeHttpAdapter = /** @class */ (function () {
                     mesage: 'The request method is empty'
                 });
             }
-            var urlInfo = new URL(options.url);
-            var _options = Object.assign(options, {
-                hostname: urlInfo.hostname || window.location.hostname || '127.0.0.1',
+            const urlInfo = new URL(URL.canParse(options.url) ? options.url : window.location.origin + options.url);
+            const _options = Object.assign(options, {
+                hostname: urlInfo.hostname || window.location.hostname,
                 port: urlInfo.port || 80,
-                path: urlInfo.pathname + urlInfo.search || ''
+                path: urlInfo.pathname + urlInfo.search || '',
             });
             delete _options.url;
             //创建请求示例
-            var _h = request(_options, function (res) {
+            const _h = request(_options, (res) => {
                 //设置响应编码
                 res.setEncoding('utf8');
                 //监听数据响应
-                var _data;
-                res.on('data', function (chunk) {
+                let _data;
+                res.on('data', (chunk) => {
                     if (!_data)
                         return _data = chunk;
                     _data instanceof Buffer ? (_data.includes(chunk)) : (_data += chunk);
                 });
                 //监听响应结束
-                res.on('end', function () {
+                res.on('end', () => {
                     if ((res.headers['content-type'] || '').indexOf('application/json') >= 0)
                         _data = JSON.parse(_data.toString() || '');
                     resolve({
@@ -6822,7 +6809,7 @@ var NodeHttpAdapter = /** @class */ (function () {
                 });
             });
             //错误拦截
-            _h.on('error', function (e) {
+            _h.on('error', (e) => {
                 reject({
                     message: e.message
                 });
@@ -6833,7 +6820,7 @@ var NodeHttpAdapter = /** @class */ (function () {
             }
             //设置超时时间
             if (!Number.isInteger(options.timeout) || Number(options.timeout) > 0) {
-                _h.setTimeout(options.timeout || 60000, function () {
+                _h.setTimeout(options.timeout || 60000, () => {
                     reject({
                         message: 'time out'
                     });
@@ -6842,59 +6829,48 @@ var NodeHttpAdapter = /** @class */ (function () {
             //结束写入
             _h.end();
         });
-    };
-    return NodeHttpAdapter;
-}());
+    }
+}
 
 /**
  * 请求方法
  */
 var HttpClientRequestMethod;
 (function (HttpClientRequestMethod) {
-    HttpClientRequestMethod["GET"] = "get";
-    HttpClientRequestMethod["POST"] = "post";
+    HttpClientRequestMethod["GET"] = "GET";
+    HttpClientRequestMethod["POST"] = "POST";
 })(HttpClientRequestMethod || (HttpClientRequestMethod = {}));
-var HttpClientInstance = /** @class */ (function () {
-    function HttpClientInstance(options) {
+class HttpClientInstance {
+    constructor(options) {
         this.defaultOption = options;
     }
-    HttpClientInstance.prototype.get = function (url, params, options) {
-        return this.request(Object.assign(this.defaultOption, options, { url: url, method: HttpClientRequestMethod.GET, params: params }));
-    };
-    HttpClientInstance.prototype.post = function (url, data, options) {
-        return this.request(Object.assign(this.defaultOption, options, { url: url, method: HttpClientRequestMethod.POST, data: data }));
-    };
-    HttpClientInstance.prototype.request = function (options) {
-        var adapter = typeof XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
-        return adapter.send(Object.assign(this.defaultOption, options));
-    };
-    return HttpClientInstance;
-}());
-var HttpClient = /** @class */ (function () {
-    function HttpClient() {
+    get(url, params, options) {
+        return this.request(Object.assign(this.defaultOption, options, { url, method: HttpClientRequestMethod.GET, params }));
     }
-    HttpClient.prototype.create = function (options) {
+    post(url, data, options) {
+        return this.request(Object.assign(this.defaultOption, options, { url, method: HttpClientRequestMethod.POST, data }));
+    }
+    request(options) {
+        // const adapter = typeof XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
+        const adapter = new NodeHttpAdapter();
+        return adapter.send(Object.assign(this.defaultOption, options));
+    }
+}
+class HttpClient {
+    static create(options) {
         return new HttpClientInstance(options);
-    };
-    return HttpClient;
-}());
-var HttpClient$1 = new HttpClient();
+    }
+}
 
-/**
- * 翻译语言
- */
-var TranslationLanguage;
-(function (TranslationLanguage) {
-    TranslationLanguage["ZH"] = "ZH";
-    TranslationLanguage["EN"] = "EN";
-})(TranslationLanguage || (TranslationLanguage = {}));
-/**
- * 翻译引擎
- */
-var TranslateEngine = /** @class */ (function () {
-    function TranslateEngine(options) {
-        if (!options.host) {
-            throw new Error('The deeplx host address cannot be emptry');
+var DeeplxLanguage;
+(function (DeeplxLanguage) {
+    DeeplxLanguage["ZH"] = "ZH";
+    DeeplxLanguage["EN"] = "EN";
+})(DeeplxLanguage || (DeeplxLanguage = {}));
+class DeeplxTranslateEngine {
+    constructor(options) {
+        if (!options.url) {
+            throw new Error('The deeplx translation address cannot be emptry');
         }
         if (!options.authorization) {
             throw new Error('The deeplx request token cannot be emptry');
@@ -6905,12 +6881,12 @@ var TranslateEngine = /** @class */ (function () {
         if (!options.target) {
             throw new Error('The target language cannot be emptry');
         }
-        this.src = options.src || TranslationLanguage.ZH;
-        this.target = options.target || TranslationLanguage.EN;
+        this.src = options.src || DeeplxLanguage.ZH;
+        this.target = options.target || DeeplxLanguage.EN;
         this.languageMap = options.languageMap || {};
-        this.host = options.host;
+        this.url = options.url;
         this.authorization = options.authorization;
-        this.http = HttpClient$1.create({
+        this.http = HttpClient.create({
             timeout: options.timeout
         });
     }
@@ -6919,21 +6895,21 @@ var TranslateEngine = /** @class */ (function () {
      * @param options 配置信息
      * @returns
      */
-    TranslateEngine.prototype.getLocalTranslateLanguageMapKeyByOption = function (options) {
-        return "".concat(options.src || this.src, "-").concat(options.target || this.target);
-    };
+    getLocalTranslateLanguageMapKeyByOption(options) {
+        return `${options.src || this.src}-${options.target || this.target}`;
+    }
     /**
      * 根据key获取本地语言映射表信息
      * @param key 映射标识 格式：[srcource language]-[target language]
      * @returns
      */
-    TranslateEngine.prototype.getLocalTranslateLanguageMapInfoByKey = function (key) {
-        return (this.languageMap[key] || []).sort(function (v1, v2) {
-            var width1 = v1.weight == undefined ? 0 : v1.weight;
-            var width2 = v2.weight == undefined ? 0 : v2.weight;
+    getLocalTranslateLanguageMapInfoByKey(key) {
+        return (this.languageMap[key] || []).sort((v1, v2) => {
+            const width1 = v1.weight == undefined ? 0 : v1.weight;
+            const width2 = v2.weight == undefined ? 0 : v2.weight;
             return width2 - width1;
         });
-    };
+    }
     /**
      * 发送翻译请求
      * @param text 需要翻译的文本
@@ -6941,58 +6917,57 @@ var TranslateEngine = /** @class */ (function () {
      * @param target 目标语言
      * @returns
      */
-    TranslateEngine.prototype.requestTranslate = function (text, src, target) {
-        return this.http.post(this.host + '/translate', {
+    requestTranslate(text, src, target) {
+        return this.http.post(this.url, {
             "text": text,
-            "source_language": src || this.src,
-            "target_language": target || this.target
+            "source_lang": src || this.src,
+            "target_lang": target || this.target
         }, {
             headers: {
                 'Authorization': this.authorization
             }
         });
-    };
+    }
     /**
      * 根据本地语言映射表标记原始文本
      * @param localLanguageMapInfo
      * @param info
      * @returns
      */
-    TranslateEngine.prototype.encodeTranslateMapping = function (localLanguageMapInfo, info) {
+    encodeTranslateMapping(localLanguageMapInfo, info) {
         info = JSON.parse(JSON.stringify(info));
-        var text = info.text || '';
-        localLanguageMapInfo.forEach(function (map, index) {
+        let text = info.text || '';
+        localLanguageMapInfo.forEach((map, index) => {
             text = text.replace(map.src, '${' + index + '}');
         });
         info.text = text;
         return info;
-    };
+    }
     /**
      * 根据本地语言映射表解析翻译结果
      * @param key 映射标识
      * @param responseText 翻译响应结果文本
      * @returns
      */
-    TranslateEngine.prototype.decodeTranslateMapping = function (localLanguageMapInfo, responseText) {
-        localLanguageMapInfo.forEach(function (item, index) {
+    decodeTranslateMapping(localLanguageMapInfo, responseText) {
+        localLanguageMapInfo.forEach((item, index) => {
             responseText = responseText.replace('${' + index + '}', item.target);
         });
         return responseText;
-    };
+    }
     /**
      * 单个翻译
      * @param options
      */
-    TranslateEngine.prototype.singleTranslate = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
-            var targetLanguageMapInfo = _this.getLocalTranslateLanguageMapInfoByKey(_this.getLocalTranslateLanguageMapKeyByOption(options));
-            var _options = _this.encodeTranslateMapping(targetLanguageMapInfo, options);
-            _this.requestTranslate(_options.text || '', _options.src, _options.target).then(function (res) {
+    singleTranslate(options) {
+        return new Promise((resolve, reject) => {
+            const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(this.getLocalTranslateLanguageMapKeyByOption(options));
+            const _options = this.encodeTranslateMapping(targetLanguageMapInfo, options);
+            this.requestTranslate(_options.text || '', _options.src, _options.target).then((res) => {
                 var _a;
                 resolve(res.code == 200 ? {
                     alternatives: (res.data || {}).alternatives || null,
-                    data: _this.decodeTranslateMapping(targetLanguageMapInfo, ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) || ''),
+                    data: this.decodeTranslateMapping(targetLanguageMapInfo, ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) || ''),
                     id: options.id || '',
                     success: true
                 } : {
@@ -7003,55 +6978,65 @@ var TranslateEngine = /** @class */ (function () {
                 });
             });
         });
-    };
+    }
     /**
      * 批量翻译
      * @param options
      */
-    TranslateEngine.prototype.branchTranslate = function (options) {
-        var _this = this;
-        return new Promise(function (resolve, reject) {
+    branchTranslate(options) {
+        return new Promise((resolve, reject) => {
             // 按源语言和目标语言进行分组
-            var translateGroup = {};
-            options.forEach(function (option, index) {
-                var key = _this.getLocalTranslateLanguageMapKeyByOption(option);
-                var info = translateGroup[key] || [];
+            const translateGroup = {};
+            options.forEach((option, index) => {
+                const key = this.getLocalTranslateLanguageMapKeyByOption(option);
+                const info = translateGroup[key] || [];
                 info.push(option);
                 translateGroup[key] = info;
             });
+            const requestList = [];
             //By language group Translate
-            Promise.all(Object.keys(translateGroup).map(function (key) {
-                var language = key.split('-');
-                var targetLanguageMapInfo = _this.getLocalTranslateLanguageMapInfoByKey(key);
-                var encodeTranslateInfo = translateGroup[key].map(function (item) { return _this.encodeTranslateMapping(targetLanguageMapInfo, item); });
-                var translateSrcText = JSON.stringify(encodeTranslateInfo.map(function (item) { return item.text; }));
-                _this.requestTranslate(translateSrcText, language[0], language[1]).then(function (res) {
+            Promise.all(Object.keys(translateGroup).map(key => {
+                const language = key.split('-');
+                const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(key);
+                const encodeTranslateInfo = translateGroup[key].map(item => this.encodeTranslateMapping(targetLanguageMapInfo, item));
+                // let translateSrcText = JSON.stringify(encodeTranslateInfo.map(item => item.text));
+                let translateSrcText = encodeTranslateInfo.map(item => item.text).join(',');
+                return this.requestTranslate(translateSrcText, language[0], language[1]).then((res) => {
                     var _a;
-                    if (res.code == 200) {
-                        resolve(JSON.parse(((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) || '[]').map(function (v, i) {
-                            var info = encodeTranslateInfo[i];
-                            return {
+                    //处理返回的字符串
+                    let _resText = ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) || '';
+                    // _resText = (_resText.match(/.*]/g) || [])[0] || '[]';
+                    // _resText = _resText.replaceAll('/\"', '\\\"');
+                    // _resText = _resText.replaceAll('=\"', '=\\\"');
+                    // const data = JSON.parse(_resText)
+                    const data = _resText.split(',');
+                    if (res.code == 200 && data.length > 1) {
+                        data.forEach((v, i) => {
+                            const info = encodeTranslateInfo[i];
+                            requestList.push({
                                 alternatives: (res.data || {}).alternatives || null,
-                                data: _this.decodeTranslateMapping(targetLanguageMapInfo, v),
+                                data: this.decodeTranslateMapping(targetLanguageMapInfo, v),
                                 id: info.id,
                                 success: true
-                            };
-                        }));
+                            });
+                        });
                     }
                     else {
-                        resolve(translateGroup[key].map(function (info) {
-                            return {
+                        translateGroup[key].forEach(info => {
+                            requestList.push({
                                 alternatives: null,
                                 data: info.text || '',
                                 id: info.id,
                                 success: false
-                            };
-                        }));
+                            });
+                        });
                     }
                 });
-            }));
+            })).finally(() => {
+                resolve(requestList);
+            });
         });
-    };
+    }
     /**
      *
      * @param options Translation Configura Option
@@ -7059,77 +7044,257 @@ var TranslateEngine = /** @class */ (function () {
      * otherwise return `Promise<Array<TranslateResponseOption>>` type
      *
      */
-    TranslateEngine.prototype.translate = function (options) {
+    translate(options) {
         return !(options instanceof Array) ? this.singleTranslate(options) : options.length == 1 ? this.singleTranslate(options[0]) : this.branchTranslate(options);
-    };
-    return TranslateEngine;
-}());
-
-var TranslateVuePlugin = /** @class */ (function () {
-    function TranslateVuePlugin(options) {
-        this.engine = new TranslateEngine(options);
     }
-    TranslateVuePlugin.prototype.translateVUE2 = function () {
+}
+
+class TranslateEngineInstance {
+    constructor(enine) {
+        this._engine = enine;
+    }
+    singleTranslate(options) {
+        return this._engine.singleTranslate(options);
+    }
+    branchTranslate(options) {
+        return this._engine.branchTranslate(options);
+    }
+    translate(options) {
+        return this._engine.translate(options);
+    }
+}
+
+/**
+ * translation queue
+ */
+class TranslationQueue {
+    constructor(engine) {
+        this._queue = [];
+        this._timer = null;
+        this._engine = engine;
+    }
+    /**
+     * added translation queue item
+     * @param options one or more queue options
+     * @returns
+     */
+    add(...options) {
+        this._queue.push(...options);
+        if (this._timer != null)
+            clearTimeout(this._timer);
+        this._timer = setTimeout(() => {
+            this.request();
+        }, 200);
+    }
+    request() {
+        const requestList = [];
+        const requestQueue = this._queue.map((info, i1) => {
+            info.request = true;
+            let _t = info.text;
+            [...info.text.matchAll(/>(.*?)</g)].reduce((addIndex, rex, i2) => {
+                const id = `{${i1}_${i2}}`, startIndex = addIndex + (rex.index || 0) + 1, endIndex = rex[1].length + startIndex;
+                _t = _t.substring(0, startIndex) + id + _t.substring(endIndex, _t.length);
+                requestList.push({
+                    id: `${i1}_${i2}`,
+                    text: rex[1],
+                    src: info.src || '',
+                    target: info.target || '',
+                    languageMap: info.languageMap
+                });
+                return addIndex - (rex[1].length - id.length);
+            }, 0);
+            return {
+                src: info,
+                encodeText: _t,
+            };
+        });
+        this._engine.branchTranslate(requestList).then(res => {
+            console.log('----res', res);
+            res.forEach(info => {
+                const ids = info.id.split('_');
+                requestQueue[Number(ids[0])].encodeText = requestQueue[Number(ids[0])].encodeText.replace(`{${info.id}}`, info.data);
+            });
+            requestQueue.forEach(info => {
+                info.src.el.innerHTML = info.encodeText;
+            });
+            // this._queue.forEach((info, index) => {
+            //   info.el.innerHTML = (res.find(item => item.id == index) || {}).data || ''
+            // })
+        });
+    }
+    /**
+     * By node element remove queue items
+     * Only remove queues with element  `request` option set to false or undefined
+     * @param el node element
+     */
+    remove(el) {
+        this._queue = (this._queue || []).filter(info => info.el == el && !info.request);
+    }
+}
+let queue;
+class TranslateVuePlugin {
+    constructor(options) {
+        if (!options.engine) {
+            throw new Error('The translation engine connot be emptry');
+        }
+        this._engine = new TranslateEngineInstance(options.engine);
+    }
+    initQueue() {
+        queue = new TranslationQueue(this._engine);
+    }
+    /**
+     * registe `v-nottranslate` directive
+     * @returns vue directive options
+     */
+    regsiteNotTranslateDirective() {
         return {
-            bind: function (el, binding, vnode, prevVnode) {
-                console.log('----vue2-bind', el, binding, vnode, prevVnode);
+            /**
+             * v2.0 指令绑定到元素时
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            bind(el, binding, vnode, prevVnode) {
+                el.setAttribute('not-translate', 'true');
+                queue.add({
+                    el,
+                    text: el.outerHTML,
+                    translate: false
+                });
             },
-            inserted: function () {
+            /**
+             * v2.0 所在组件的 VNode 更新时调用，但是可能发生在其子 VNode 更新之前
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            update(el, binding, vnode, prevVnode) {
+                if (!el.getAttribute('not-translate')) {
+                    el.setAttribute('not-translate', 'true');
+                    queue.add({
+                        el,
+                        text: el.outerHTML,
+                        translate: false,
+                    });
+                }
             },
-            update: function () {
+            /**
+             * v3.0 在绑定元素的父组,及他自己的所有子节点都挂载完成后调用
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            mounted(el, binding, vnode, prevVnode) {
+                el.setAttribute('not-translate', 'true');
+                queue.add({
+                    el,
+                    text: el.outerHTML,
+                    translate: false,
+                });
             },
-            componentUpdated: function (el, binding, vnode, prevVnode) {
-                console.log('----vue2-componentUpdated', el, binding, vnode, prevVnode);
+            /**
+             * v3.0 在绑定元素的父组件,及他自己的所有子节点都更新后调用
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            updated(el, binding, vnode, prevVnode) {
+                if (!el.getAttribute('not-translate')) {
+                    el.setAttribute('not-translate', 'true');
+                    queue.add({
+                        el,
+                        text: el.outerHTML,
+                        translate: false,
+                    });
+                }
             },
-            unbind: function () {
-            }
         };
-    };
-    TranslateVuePlugin.prototype.translateVUE3 = function () {
+    }
+    /**
+     * registe `v-translate` directive
+     * @returns vue directive options
+     */
+    retaiteTranslateDirective() {
         return {
-            // 在绑定元素的 attribute 前
-            // 或事件监听器应用前调用
-            created: function (el, binding, vnode, prevVnode) {
-                // 下面会介绍各个参数的细节
+            /**
+             * [v2.0] 指令绑定到元素时
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            bind: (el, binding, vnode, prevVnode) => {
+                queue.add(Object.assign({ el, text: el.outerHTML, translate: true }, (binding.value || {})));
             },
-            // 在元素被插入到 DOM 前调用
-            beforeMount: function (el, binding, vnode, prevVnode) { },
-            // 在绑定元素的父组件
-            // 及他自己的所有子节点都挂载完成后调用
-            mounted: function (el, binding, vnode, prevVnode) { },
-            // 绑定元素的父组件更新前调用
-            beforeUpdate: function (el, binding, vnode, prevVnode) { },
-            // 在绑定元素的父组件
-            // 及他自己的所有子节点都更新后调用
-            updated: function (el, binding, vnode, prevVnode) { },
-            // 绑定元素的父组件卸载前调用
-            beforeUnmount: function (el, binding, vnode, prevVnode) { },
-            // 绑定元素的父组件卸载后调用
-            unmounted: function (el, binding, vnode, prevVnode) { }
+            /**
+             * [v2.0] 子组件和组件都更新完成时
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            componentUpdated: (el, binding, vnode, prevVnode) => {
+                queue.add(Object.assign({ el, text: el.outerHTML, translate: true }, (binding.value || {})));
+            },
+            /**
+             * [v2.0] 指令与元素解绑时调用
+             * @param el
+             */
+            unbind: (el) => {
+                queue.remove(el);
+            },
+            /**
+             * [v3.0] 在绑定元素的父组,及他自己的所有子节点都挂载完成后调用
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            mounted: (el, binding, vnode, prevVnode) => {
+                queue.add(Object.assign({ el, text: el.outerHTML, translate: true }, (binding.value || {})));
+            },
+            /**
+             * [v3.0] 在绑定元素的父组件,及他自己的所有子节点都更新后调用
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            updated: (el, binding, vnode, prevVnode) => {
+                queue.add(Object.assign({ el, text: el.outerHTML, translate: true }, (binding.value || {})));
+            },
+            /**
+             * [v3.0] 绑定元素的父组件卸载前调用
+             * @param el
+             * @param binding
+             * @param vnode
+             * @param prevVnode
+             */
+            beforeUnmount: (el, binding, vnode, prevVnode) => {
+                queue.remove(el);
+            },
         };
-    };
-    return TranslateVuePlugin;
-}());
+    }
+}
 var TranslateVuePlugin$1 = {
-    install: function (app, options) {
-        var plugin = new TranslateVuePlugin(options);
-        var version = Number(app.version.split('.')[0]);
-        if (version < 3) {
-            app.directive('translate', plugin.translateVUE2());
-            app.prototype.$translate = plugin.translateVUE2;
-        }
-        else {
-            app.directive('translate', plugin.translateVUE3());
-            app.config.globalProperties.$translate = plugin.translateVUE3;
-        }
+    install(app, options) {
+        const plugin = new TranslateVuePlugin(options);
+        plugin.initQueue();
+        app.directive('translate', plugin.retaiteTranslateDirective());
+        app.directive('nottranslate', plugin.regsiteNotTranslateDirective());
     }
 };
 
-var Translate = {
-    TranslateEngine: TranslateEngine,
-    TranslateVuePlugin: TranslateVuePlugin$1,
-    TranslationLanguage: TranslationLanguage
+// this module should only have a default export
+var translate = {
+    DeeplxTranslateEngine,
+    DeeplxLanguage,
+    TranslateVuePlugin: TranslateVuePlugin$1
 };
 
-module.exports = Translate;
+module.exports = translate;
 //# sourceMappingURL=translate.cjs.map

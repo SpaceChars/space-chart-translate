@@ -1,11 +1,10 @@
-import { TranslateEngine,TranslationLanguage} from './engine';
+// this module should only have a default export
+import { DeeplxTranslateEngine, DeeplxLanguage } from '../engines/index'
 
-import TranslateVuePlugin from '../../platform/vue/index'
+import TranslateVuePlugin from '../../plugins/vue/index'
 
-const Translate = {
-  TranslateEngine,
-  TranslateVuePlugin,
-  TranslationLanguage
+export default {
+  DeeplxTranslateEngine,
+  DeeplxLanguage,
+  TranslateVuePlugin
 }
-
-export default Translate

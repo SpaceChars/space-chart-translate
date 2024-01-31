@@ -19,12 +19,12 @@ export default class NodeHttpAdapter implements IHttpAdapter {
         })
       }
 
-      const urlInfo = new URL(options.url);
+      const urlInfo = new URL(URL.canParse(options.url) ? options.url : window.location.origin + options.url);
 
       const _options = Object.assign(options, {
-        hostname: urlInfo.hostname || window.location.hostname || '127.0.0.1',
+        hostname: urlInfo.hostname || window.location.hostname,
         port: urlInfo.port || 80,
-        path: urlInfo.pathname + urlInfo.search || ''
+        path: urlInfo.pathname + urlInfo.search || '',
       })
 
       delete _options.url;

@@ -1,11 +1,4 @@
 /**
- * 翻译语言
- */
-declare enum TranslationLanguage$1 {
-    ZH = "ZH",
-    EN = "EN"
-}
-/**
  * 语言词典库——单项词典信息
  */
 interface LanguageMapItemInfo {
@@ -16,22 +9,17 @@ interface LanguageMapItemInfo {
 /**
  * 默认翻译语言配置
  */
-interface TranslateConfigLanguageDefaultOption {
-    src: TranslationLanguage$1 | string;
-    target: TranslationLanguage$1 | string;
+interface TranslateDefaultConfiguraOption {
+    src: string;
+    target: string;
     languageMap?: {
-        [name: TranslationLanguage | string]: Array<LanguageMapItemInfo>;
+        [name: string]: Array<LanguageMapItemInfo>;
     };
-}
-interface TranslateConfigDefaultOption extends TranslateConfigLanguageDefaultOption {
-    host: string;
-    authorization: string;
-    timeout?: number;
 }
 /**
  * 翻译配置
  */
-interface TranslateConfigOption extends TranslateConfigLanguageDefaultOption {
+interface TranslateConfigOption extends TranslateDefaultConfiguraOption {
     text?: string;
     id: string | number;
 }
@@ -49,18 +37,31 @@ interface TranslateResponseOption {
  */
 interface ITranslateEngine {
     translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<TranslateResponseOption> | Promise<Array<TranslateResponseOption>>;
+    singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption>;
+    branchTranslate(options: Array<TranslateConfigOption>): Promise<Array<TranslateResponseOption>>;
 }
-/**
- * 翻译引擎
- */
-declare class TranslateEngine$1 implements ITranslateEngine {
+
+interface PluginDefaultConfiguraOption {
+    engine: ITranslateEngine;
+}
+
+declare enum DeeplxLanguage$1 {
+    ZH = "ZH",
+    EN = "EN"
+}
+interface DeeplxDefaultConfiguraOption extends TranslateDefaultConfiguraOption {
+    url: string;
+    authorization: string;
+    timeout?: number;
+}
+declare class DeeplxTranslateEngine$1 implements ITranslateEngine {
     private src;
     private target;
     private languageMap;
-    private host;
+    private url;
     private authorization;
     private http;
-    constructor(options: TranslateConfigDefaultOption);
+    constructor(options: DeeplxDefaultConfiguraOption);
     /**
      * 根据配置信息获取本地语言映射表映射标识
      * @param options 配置信息
@@ -115,19 +116,19 @@ declare class TranslateEngine$1 implements ITranslateEngine {
     translate(options: TranslateConfigOption | Array<TranslateConfigOption>): Promise<TranslateResponseOption> | Promise<Array<TranslateResponseOption>>;
 }
 
-declare const Translate: {
-    TranslateEngine: typeof TranslateEngine$1;
+declare const _default: {
+    DeeplxTranslateEngine: typeof DeeplxTranslateEngine$1;
+    DeeplxLanguage: typeof DeeplxLanguage$1;
     TranslateVuePlugin: {
-        install(app: any, options: TranslateConfigDefaultOption): void;
+        install(app: any, options: PluginDefaultConfiguraOption): void;
     };
-    TranslationLanguage: typeof TranslationLanguage$1;
 };
 
-declare const TranslateEngine: typeof TranslateEngine$1;
+declare const DeeplxTranslateEngine: typeof DeeplxTranslateEngine$1;
+declare const DeeplxLanguage: typeof DeeplxLanguage$1;
 declare const TranslateVuePlugin: {
-    install(app: any, options: TranslateConfigDefaultOption): void;
+    install(app: any, options: PluginDefaultConfiguraOption): void;
 };
-declare const TranslationLanguage: typeof TranslationLanguage$1;
 
-export { TranslateEngine, TranslateVuePlugin, TranslationLanguage, Translate as default };
+export { DeeplxLanguage, DeeplxTranslateEngine, TranslateVuePlugin, _default as default };
 //# sourceMappingURL=index.d.ts.map

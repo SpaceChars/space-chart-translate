@@ -5,8 +5,8 @@ import NodeHttpAdapter from './nodeHttpAdpater'
  * 请求方法
  */
 export enum HttpClientRequestMethod {
-  GET = 'get',
-  POST = 'post'
+  GET = 'GET',
+  POST = 'POST'
 }
 
 export interface HttpClientRequestDefaultOption {
@@ -69,15 +69,16 @@ export class HttpClientInstance implements IHttpClient {
   }
 
   request<T>(options: HttpClientRequestOption): Promise<HtptClientResponseOption<T>> {
-    const adapter = typeof XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
+    // const adapter = typeof XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
+    const adapter = new NodeHttpAdapter();
     return adapter.send<T>(Object.assign(this.defaultOption, options))
   }
 }
 
 export class HttpClient {
-  create(options: HttpClientRequestDefaultOption): HttpClientInstance {
+  static create(options: HttpClientRequestDefaultOption): HttpClientInstance {
     return new HttpClientInstance(options)
   }
 }
 
-export default new HttpClient()
+export default HttpClient

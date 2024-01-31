@@ -1,10 +1,11 @@
 {
     "compilerOptions": {
+        "target": "ES2015",
         "module": "ESNext",
-        "lib": ["DOM", "ES2015"],
+        "lib": ["DOM", "ES2015", "ES2021.String"],
         "types": ["node"],
         "strict": true,
         "noEmit": true
     },
-    "exclude": ["test/index"]
+    "exclude": ["test/index.ts"]
 }

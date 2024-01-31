@@ -19,7 +19,7 @@ const pkg = require("./package.json");
 
 const tsPlugins = [
     typescript({
-        tslib: require.resolve("tslib")
+        // tslib: require.resolve("tslib")
     }),
     nodePolyfills()
 ];

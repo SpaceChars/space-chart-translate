@@ -17,7 +17,7 @@ const translate = new TranslateEngine({
   src: TranslationLanguage.ZH,
   target: TranslationLanguage.EN,
   languageMap: map,
-  host: 'http://translate.cxjfun.top',
+  url: 'http://translate.cxjfun.top',
   authorization: "Bearer deeplx"
 })
 
