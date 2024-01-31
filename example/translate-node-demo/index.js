@@ -1,11 +1,17 @@
-const { TranslateEngine, TranslationLanguage } = require("@spacechart/translate");
+const {
+    DeeplxTranslateEngine,
+    DeeplxLanguage,
+    TranslateEngineInstance
+} = require("@spacechart/translate");
 
-const engine = new TranslateEngine({
-    host: "http://translate.cxjfun.top",
-    src: TranslationLanguage.ZH,
-    target: TranslationLanguage.EN,
-    authorization: "Bearer deeplx"
-});
+const engine = new TranslateEngineInstance(
+    new DeeplxTranslateEngine({
+        url: "http://translate.cxjfun.top/translate",
+        src: DeeplxLanguage.ZH,
+        target: DeeplxLanguage.EN,
+        authorization: "Bearer deeplx"
+    })
+);
 
 engine
     .translate({
