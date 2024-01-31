@@ -38,6 +38,10 @@
         "url": "https://github.com/SpaceChars/space-chart-translate/issues"
     },
     "homepage": "https://github.com/SpaceChars/space-chart-translate#readme",
+    "publishConfig": {
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
+    },
     "devDependencies": {
         "@babel/core": "^7.23.7",
         "@babel/preset-env": "^7.23.8",
