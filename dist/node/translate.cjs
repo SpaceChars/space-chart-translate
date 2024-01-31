@@ -219,13 +219,23 @@ class DeeplxTranslateEngine {
      */
     singleTranslate(options) {
         return new Promise((resolve, reject) => {
+            //是否是需要忽略翻译的文本
+            const ignore = options.text == null || options.text == undefined || options.text.length <= 0 || !Number.isNaN(Number(options.text));
+            if (ignore) {
+                return resolve({
+                    alternatives: null,
+                    data: options.text || '',
+                    id: options.id,
+                    success: false
+                });
+            }
             const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(this.getLocalTranslateLanguageMapKeyByOption(options));
             const _options = this.encodeTranslateMapping(targetLanguageMapInfo, options);
             this.requestTranslate(_options.text || '', _options.src, _options.target).then((res) => {
-                var _a;
-                resolve(res.code == 200 ? {
+                var _a, _b;
+                resolve(res.code == 200 && ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) ? {
                     alternatives: (res.data || {}).alternatives || null,
-                    data: this.decodeTranslateMapping(targetLanguageMapInfo, ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) || ''),
+                    data: this.decodeTranslateMapping(targetLanguageMapInfo, ((_b = res.data) === null || _b === void 0 ? void 0 : _b.data) || ''),
                     id: options.id || '',
                     success: true
                 } : {
@@ -243,54 +253,10 @@ class DeeplxTranslateEngine {
      */
     branchTranslate(options) {
         return new Promise((resolve, reject) => {
-            // 按源语言和目标语言进行分组
-            const translateGroup = {};
-            options.forEach((option, index) => {
-                const key = this.getLocalTranslateLanguageMapKeyByOption(option);
-                const info = translateGroup[key] || [];
-                info.push(option);
-                translateGroup[key] = info;
-            });
             const requestList = [];
-            //By language group Translate
-            Promise.all(Object.keys(translateGroup).map(key => {
-                const language = key.split('-');
-                const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(key);
-                const encodeTranslateInfo = translateGroup[key].map(item => this.encodeTranslateMapping(targetLanguageMapInfo, item));
-                // let translateSrcText = JSON.stringify(encodeTranslateInfo.map(item => item.text));
-                let translateSrcText = encodeTranslateInfo.map(item => item.text).join(',');
-                return this.requestTranslate(translateSrcText, language[0], language[1]).then((res) => {
-                    var _a;
-                    //处理返回的字符串
-                    let _resText = ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) || '';
-                    // _resText = (_resText.match(/.*]/g) || [])[0] || '[]';
-                    // _resText = _resText.replaceAll('/\"', '\\\"');
-                    // _resText = _resText.replaceAll('=\"', '=\\\"');
-                    // const data = JSON.parse(_resText)
-                    const data = _resText.split(',');
-                    if (res.code == 200 && data.length > 1) {
-                        data.forEach((v, i) => {
-                            const info = encodeTranslateInfo[i];
-                            requestList.push({
-                                alternatives: (res.data || {}).alternatives || null,
-                                data: this.decodeTranslateMapping(targetLanguageMapInfo, v),
-                                id: info.id,
-                                success: true
-                            });
-                        });
-                    }
-                    else {
-                        translateGroup[key].forEach(info => {
-                            requestList.push({
-                                alternatives: null,
-                                data: info.text || '',
-                                id: info.id,
-                                success: false
-                            });
-                        });
-                    }
-                });
-            })).finally(() => {
+            Promise.all(options.map(info => this.singleTranslate(info))).then((res) => {
+                requestList.push(...res);
+            }).finally(() => {
                 resolve(requestList);
             });
         });
@@ -327,7 +293,8 @@ class TranslateEngineInstance {
  */
 class TranslationQueue {
     constructor(engine) {
-        this._queue = [];
+        this._waitingQueue = []; //waiting queue
+        this._requestQueue = []; //request queue
         this._timer = null;
         this._engine = engine;
     }
@@ -337,17 +304,18 @@ class TranslationQueue {
      * @returns
      */
     add(...options) {
-        this._queue.push(...options);
+        this._waitingQueue.push(...options);
         if (this._timer != null)
             clearTimeout(this._timer);
         this._timer = setTimeout(() => {
+            this._requestQueue = this._waitingQueue;
+            this._waitingQueue = [];
             this.request();
         }, 200);
     }
     request() {
         const requestList = [];
-        const requestQueue = this._queue.map((info, i1) => {
-            info.request = true;
+        const requestQueue = this._requestQueue.map((info, i1) => {
             let _t = info.text;
             [...info.text.matchAll(/>(.*?)</g)].reduce((addIndex, rex, i2) => {
                 const id = `{${i1}_${i2}}`, startIndex = addIndex + (rex.index || 0) + 1, endIndex = rex[1].length + startIndex;
@@ -375,9 +343,6 @@ class TranslationQueue {
             requestQueue.forEach(info => {
                 info.src.el.innerHTML = info.encodeText;
             });
-            // this._queue.forEach((info, index) => {
-            //   info.el.innerHTML = (res.find(item => item.id == index) || {}).data || ''
-            // })
         });
     }
     /**
@@ -386,7 +351,7 @@ class TranslationQueue {
      * @param el node element
      */
     remove(el) {
-        this._queue = (this._queue || []).filter(info => info.el == el && !info.request);
+        this._waitingQueue = (this._waitingQueue || []).filter(info => info.el == el);
     }
 }
 let queue;
@@ -428,7 +393,7 @@ class TranslateVuePlugin {
              * @param vnode
              * @param prevVnode
              */
-            update(el, binding, vnode, prevVnode) {
+            componentUpdated(el, binding, vnode, prevVnode) {
                 if (!el.getAttribute('not-translate')) {
                     el.setAttribute('not-translate', 'true');
                     queue.add({
@@ -495,7 +460,7 @@ class TranslateVuePlugin {
              * @param vnode
              * @param prevVnode
              */
-            componentUpdated: (el, binding, vnode, prevVnode) => {
+            update: (el, binding, vnode, prevVnode) => {
                 queue.add(Object.assign({ el, text: el.outerHTML, translate: true }, (binding.value || {})));
             },
             /**

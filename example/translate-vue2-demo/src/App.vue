@@ -13,7 +13,7 @@
         <div v-translate="{ global: true,src:'EN',target:'ZH'}">
             11
             <HelloWorld msg="Welcome to Your Vue.js App" />
-            <div v-translate>{{ total }}</div>
+            <div v-translate>你好</div>
             11
         </div>
     </div>
@@ -51,7 +51,7 @@ export default {
     mounted() {
         // setInterval(() => {
         //     this.total += 1;
-        // }, 2000);
+        // }, 1000);
     }
 };
 </script>

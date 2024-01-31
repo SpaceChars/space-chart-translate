@@ -10,12 +10,12 @@ interface TranslationQueueItemOption {
   target?: string
   languageMap?: { [name: string]: Array<LanguageMapItemInfo> },
   translate: boolean
-  request?: boolean
   el: HTMLElement
 }
 
 interface TranslateRequestQueueItemOption {
   src: TranslationQueueItemOption
+  child: Array<TranslateRequestQueueItemOption>
   encodeText: string
 }
 
@@ -24,7 +24,9 @@ interface TranslateRequestQueueItemOption {
  */
 
 class TranslationQueue {
-  private _queue: Array<TranslationQueueItemOption> = [];
+  private _waitingQueue: Array<TranslationQueueItemOption> = [];//waiting queue
+  private _requestQueue: Array<TranslationQueueItemOption> = [];//request queue
+
   private _engine: TranslateEngineInstance;
   private _timer: NodeJS.Timeout | null = null;
 
@@ -38,10 +40,13 @@ class TranslationQueue {
    * @returns 
    */
   add(...options: Array<TranslationQueueItemOption>) {
-    this._queue.push(...options)
+
+    this._waitingQueue.push(...options)
 
     if (this._timer != null) clearTimeout(this._timer);
     this._timer = setTimeout(() => {
+      this._requestQueue = this._waitingQueue
+      this._waitingQueue = [];
       this.request()
     }, 200)
   }
@@ -50,9 +55,7 @@ class TranslationQueue {
 
     const requestList: Array<TranslateConfigOption> = []
 
-    const requestQueue: Array<TranslateRequestQueueItemOption> = this._queue.map((info, i1) => {
-
-      info.request = true;
+    const requestQueue: Array<TranslateRequestQueueItemOption> = this._requestQueue.map((info, i1) => {
 
       let _t = info.text;
 
@@ -78,15 +81,13 @@ class TranslationQueue {
 
       return {
         src: info,
+        child: [],
         encodeText: _t,
       }
 
     })
 
     this._engine.branchTranslate(requestList).then(res => {
-
-      console.log('----res', res);
-
 
       res.forEach(info => {
         const ids = (info.id as string).split('_');
@@ -97,10 +98,6 @@ class TranslationQueue {
         info.src.el.innerHTML = info.encodeText
       })
 
-
-      // this._queue.forEach((info, index) => {
-      //   info.el.innerHTML = (res.find(item => item.id == index) || {}).data || ''
-      // })
     })
   }
 
@@ -110,7 +107,7 @@ class TranslationQueue {
    * @param el node element
    */
   remove(el: HTMLElement | Node) {
-    this._queue = (this._queue || []).filter(info => info.el == el && !info.request)
+    this._waitingQueue = (this._waitingQueue || []).filter(info => info.el == el)
   }
 }
 
@@ -235,7 +232,7 @@ class TranslateVuePlugin {
        * @param vnode 
        * @param prevVnode 
        */
-      componentUpdated: (el: HTMLElement, binding: any, vnode: any, prevVnode: any) => {
+      update: (el: HTMLElement, binding: any, vnode: any, prevVnode: any) => {
         queue.add({
           el,
           text: el.outerHTML,

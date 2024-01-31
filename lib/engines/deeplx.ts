@@ -133,12 +133,23 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
   singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption> {
     return new Promise((resolve, reject) => {
 
+      //是否是需要忽略翻译的文本
+      const ignore = options.text == null || options.text == undefined || options.text.length <= 0 || !Number.isNaN(Number(options.text))
+      if (ignore) {
+        return resolve({
+          alternatives: null,
+          data: options.text || '',
+          id: options.id,
+          success: false
+        })
+      }
+
       const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(this.getLocalTranslateLanguageMapKeyByOption(options))
 
       const _options = this.encodeTranslateMapping(targetLanguageMapInfo, options)
 
       this.requestTranslate(_options.text || '', _options.src, _options.target).then((res) => {
-        resolve(res.code == 200 ? {
+        resolve(res.code == 200 && res.data?.data ? {
           alternatives: (res.data || {}).alternatives || null,
           data: this.decodeTranslateMapping(targetLanguageMapInfo, res.data?.data || ''),
           id: options.id || '',
@@ -163,70 +174,13 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
 
     return new Promise((resolve, reject) => {
 
-      // 按源语言和目标语言进行分组
-      const translateGroup: { [name: string]: Array<TranslateConfigOption> } = {};
-
-      options.forEach((option, index) => {
-
-        const key = this.getLocalTranslateLanguageMapKeyByOption(option)
-
-        const info: Array<TranslateConfigOption> = translateGroup[key] || [];
-        info.push(option)
-
-        translateGroup[key] = info;
-      })
-
       const requestList: Array<TranslateResponseOption> = []
 
-      //By language group Translate
-      Promise.all(Object.keys(translateGroup).map(key => {
-
-        const language = key.split('-');
-
-        const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(key)
-
-        const encodeTranslateInfo = translateGroup[key].map(item => this.encodeTranslateMapping(targetLanguageMapInfo, item))
-
-        // let translateSrcText = JSON.stringify(encodeTranslateInfo.map(item => item.text));
-        let translateSrcText = encodeTranslateInfo.map(item => item.text).join(',');
-
-        return this.requestTranslate(translateSrcText, language[0], language[1]).then((res) => {
-
-          //处理返回的字符串
-          let _resText = res.data?.data || '';
-          // _resText = (_resText.match(/.*]/g) || [])[0] || '[]';
-          // _resText = _resText.replaceAll('/\"', '\\\"');
-          // _resText = _resText.replaceAll('=\"', '=\\\"');
-
-          // const data = JSON.parse(_resText)
-          const data = _resText.split(',')
-          if (res.code == 200 && data.length > 1) {
-
-            data.forEach((v: string, i: number) => {
-              const info = encodeTranslateInfo[i];
-              requestList.push({
-                alternatives: (res.data || {}).alternatives || null,
-                data: this.decodeTranslateMapping(targetLanguageMapInfo, v),
-                id: info.id,
-                success: true
-              })
-            })
-          } else {
-            translateGroup[key].forEach(info => {
-              requestList.push({
-                alternatives: null,
-                data: info.text || '',
-                id: info.id,
-                success: false
-              })
-            })
-
-          }
-        })
-      })).finally(() => {
+      Promise.all(options.map(info => this.singleTranslate(info))).then((res) => {
+        requestList.push(...res)
+      }).finally(() => {
         resolve(requestList)
       })
-
 
     })
 
