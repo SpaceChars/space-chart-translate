@@ -14,10 +14,7 @@
 const { DeeplxTranslateEngine, DeeplxLanguage } = require("@spacechart/translate");
 
 const enine = new DeeplxTranslateEngine({
-    host: "http://translate.xx.xx",
-    src: DeeplxLanguage.ZH,
-    target: DeeplxLanguage.EN,
-    authorization: "xx.xx"
+    //....
 });
 
 //发送请求
@@ -102,18 +99,11 @@ npm install @spacechart/translate
 ### 配置项目
 
 ```js
-const {
-    DeeplxTranslateEngine,
-    DeeplxLanguage,
-    TranslateEngineInstance
-} = require("@spacechart/translate");
+const { DeeplxTranslateEngine, TranslateEngineInstance } = require("@spacechart/translate");
 
 const engine = new TranslateEngineInstance(
     new DeeplxTranslateEngine({
-        host: "http://translate.xx.xx",
-        src: TranslationLanguage.ZH,
-        target: TranslationLanguage.EN,
-        authorization: "xx.xx"
+        //...
     })
 );
 
@@ -122,10 +112,10 @@ engine
         text: "你好世界"
     })
     .then((res) => {
-        console.log("---翻译结果", res[0].data.data);
+        console.log("---翻译结果", res.data);
     });
 ```
 
 ## 关于
 
-目前插件内置的引擎只有Deeplx，代码已开源，欢迎有想法的小伙伴们一起共建
+目前插件内置的引擎只有 Deeplx，代码已开源，欢迎有想法的小伙伴们一起共建

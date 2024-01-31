@@ -40,9 +40,12 @@ interface ITranslateEngine {
     singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption>;
     branchTranslate(options: Array<TranslateConfigOption>): Promise<Array<TranslateResponseOption>>;
 }
-
-interface PluginDefaultConfiguraOption {
-    engine: ITranslateEngine;
+declare class TranslateEngineInstance$1 implements ITranslateEngine {
+    private _engine;
+    constructor(enine: ITranslateEngine);
+    singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption>;
+    branchTranslate(options: TranslateConfigOption[]): Promise<TranslateResponseOption[]>;
+    translate(options: TranslateConfigOption | TranslateConfigOption[]): Promise<TranslateResponseOption> | Promise<TranslateResponseOption[]>;
 }
 
 declare enum DeeplxLanguage$1 {
@@ -119,16 +122,12 @@ declare class DeeplxTranslateEngine$1 implements ITranslateEngine {
 declare const _default: {
     DeeplxTranslateEngine: typeof DeeplxTranslateEngine$1;
     DeeplxLanguage: typeof DeeplxLanguage$1;
-    TranslateVuePlugin: {
-        install(app: any, options: PluginDefaultConfiguraOption): void;
-    };
+    TranslateEngineInstance: typeof TranslateEngineInstance$1;
 };
 
 declare const DeeplxTranslateEngine: typeof DeeplxTranslateEngine$1;
 declare const DeeplxLanguage: typeof DeeplxLanguage$1;
-declare const TranslateVuePlugin: {
-    install(app: any, options: PluginDefaultConfiguraOption): void;
-};
+declare const TranslateEngineInstance: typeof TranslateEngineInstance$1;
 
-export { DeeplxLanguage, DeeplxTranslateEngine, TranslateVuePlugin, _default as default };
+export { DeeplxLanguage, DeeplxTranslateEngine, TranslateEngineInstance, _default as default };
 //# sourceMappingURL=index.d.ts.map
