@@ -3,11 +3,12 @@
 
 import Translate from './lib/core/translate'
 
-const { DeeplxTranslateEngine,DeeplxLanguage, TranslateVuePlugin } = Translate
+const { DeeplxTranslateEngine, DeeplxLanguage, TranslateVuePlugin, TranslateEngineInstance } = Translate
 
 export {
   Translate as default,
   DeeplxTranslateEngine,
   DeeplxLanguage,
-  TranslateVuePlugin
+  TranslateVuePlugin,
+  TranslateEngineInstance
 }
