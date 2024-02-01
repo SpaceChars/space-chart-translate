@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <script src="../../dist//translate.js"></script>
+    </head>
+    <body>
+        <div id="app">你好</div>
+        <script>
+            const { TranslateHTMLPlugin, DeeplxLanguage, DeeplxTranslateEngine } = translate;
+            const plugin = TranslateHTMLPlugin.create({
+                engine: new DeeplxTranslateEngine({
+                    url: "http://translate.cxjfun.top/translate",
+                    src: DeeplxLanguage.ZH,
+                    target: DeeplxLanguage.EN,
+                    authorization: "Bearer deeplx"
+                }),
+                el: "#app"
+            });
+
+            plugin.translate({
+                src: DeeplxLanguage.ZH,
+                target: DeeplxLanguage.EN
+            });
+        </script>
+    </body>
+</html>

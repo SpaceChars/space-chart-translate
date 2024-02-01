@@ -10,10 +10,15 @@
         </el-select>
         <img alt="Vue logo" src="./assets/logo.png" />
 
-        <div v-translate="{ global: true,src:'EN',target:'ZH'}">
+        <div class="div">
+            你好yes
+            <div class="div">2222</div>
+        </div>
+
+        <div>
             11
             <HelloWorld msg="Welcome to Your Vue.js App" />
-            <div v-translate>你好</div>
+            <div>{{ total }}</div>
             11
         </div>
     </div>
@@ -28,8 +33,19 @@ export default {
         HelloWorld
     },
     watch: {
-        value() {
-            // document.querySelector('.hello').innerText='22222'
+        value(target, src) {
+            this.$t.translate({
+                src: src || "EN",
+                target,
+                languageMap: [
+                    {
+                        src: "EN",
+                        target: "ZH",
+                        srcText: "你好",
+                        targetText: "Hello"
+                    }
+                ]
+            });
         }
     },
     data() {
@@ -49,9 +65,9 @@ export default {
         };
     },
     mounted() {
-        // setInterval(() => {
-        //     this.total += 1;
-        // }, 1000);
+        setInterval(() => {
+            this.total += 1;
+        }, 1000);
     }
 };
 </script>

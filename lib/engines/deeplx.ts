@@ -1,4 +1,4 @@
-import { ITranslateEngine, LanguageMapItemInfo, TranslateConfigOption, TranslateDefaultConfiguraOption, TranslateResponseOption } from "../core/engine";
+import { ITranslateEngine, localMapItemInfo, TranslateConfigOption, TranslateDefaultConfiguraOption, TranslateLocalMapping, TranslateResponseOption } from "../core/engine";
 import { HttpClient, HttpClientInstance } from "../http/adapter";
 
 export enum DeeplxLanguage {
@@ -32,13 +32,6 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
       throw new Error('The deeplx request token cannot be emptry')
     }
 
-    if (!options.src) {
-      throw new Error('The source language cannot be emptry')
-    }
-
-    if (!options.target) {
-      throw new Error('The target language cannot be emptry')
-    }
 
     this.src = options.src || DeeplxLanguage.ZH
     this.target = options.target || DeeplxLanguage.EN
@@ -51,27 +44,7 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
     })
   }
 
-  /**
-   * 根据配置信息获取本地语言映射表映射标识
-   * @param options 配置信息
-   * @returns 
-   */
-  private getLocalTranslateLanguageMapKeyByOption(options: TranslateConfigOption): string {
-    return `${options.src || this.src}-${options.target || this.target}`;
-  }
 
-  /**
-   * 根据key获取本地语言映射表信息
-   * @param key 映射标识 格式：[srcource language]-[target language]
-   * @returns 
-   */
-  private getLocalTranslateLanguageMapInfoByKey(key: string): Array<LanguageMapItemInfo> {
-    return (this.languageMap[key] || []).sort((v1, v2) => {
-      const width1 = v1.weight == undefined ? 0 : v1.weight
-      const width2 = v2.weight == undefined ? 0 : v2.weight
-      return width2 - width1;
-    })
-  }
 
   /**
    * 发送翻译请求
@@ -81,6 +54,14 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
    * @returns 
    */
   private requestTranslate(text: string, src: DeeplxLanguage | string, target: DeeplxLanguage | string) {
+    if (!src) {
+      throw new Error('The source language cannot be emptry')
+    }
+
+    if (!target) {
+      throw new Error('The target language cannot be emptry')
+    }
+
     return this.http.post<TranslateResponseOption>(this.url,
       {
         "text": text,
@@ -93,38 +74,7 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
     })
   }
 
-  /**
-   * 根据本地语言映射表标记原始文本
-   * @param localLanguageMapInfo 
-   * @param info 
-   * @returns 
-   */
-  encodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, info: TranslateConfigOption): TranslateConfigOption {
 
-    info = JSON.parse(JSON.stringify(info));
-    let text = info.text || '';
-
-    localLanguageMapInfo.forEach((map, index) => {
-      text = text.replace(map.src, '${' + index + '}')
-    })
-
-    info.text = text;
-    return info;
-  }
-
-
-  /**
-   * 根据本地语言映射表解析翻译结果
-   * @param key 映射标识
-   * @param responseText 翻译响应结果文本
-   * @returns 
-   */
-  decodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, responseText: string): string {
-    localLanguageMapInfo.forEach((item, index) => {
-      responseText = responseText.replace('${' + index + '}', item.target)
-    })
-    return responseText;
-  }
 
   /**
    * 单个翻译
@@ -144,14 +94,13 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
         })
       }
 
-      const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(this.getLocalTranslateLanguageMapKeyByOption(options))
+      const localMapControl = new TranslateLocalMapping((options.languageMap || this.languageMap || []) as Array<localMapItemInfo>)
+      const _options = localMapControl.changeKey(options.src || this.src, options.target || this.target).encode(options)
 
-      const _options = this.encodeTranslateMapping(targetLanguageMapInfo, options)
-
-      this.requestTranslate(_options.text || '', _options.src, _options.target).then((res) => {
+      this.requestTranslate(_options.text || '', _options.src || '', _options.target || '').then((res) => {
         resolve(res.code == 200 && res.data?.data ? {
           alternatives: (res.data || {}).alternatives || null,
-          data: this.decodeTranslateMapping(targetLanguageMapInfo, res.data?.data || ''),
+          data: localMapControl.decode(res.data?.data || ''),
           id: options.id || '',
           success: true
         } : {
@@ -199,5 +148,3 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
   }
 
 }
-
-export default {}

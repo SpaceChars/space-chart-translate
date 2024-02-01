@@ -1,20 +1,10 @@
 /**
- * 语言词典库——单项词典信息
- */
-interface LanguageMapItemInfo {
-    src: string;
-    target: string;
-    weight?: number;
-}
-/**
  * 默认翻译语言配置
  */
 interface TranslateDefaultConfiguraOption {
-    src: string;
-    target: string;
-    languageMap?: {
-        [name: string]: Array<LanguageMapItemInfo>;
-    };
+    src?: string;
+    target?: string;
+    languageMap?: Array<localMapItemInfo>;
 }
 /**
  * 翻译配置
@@ -40,9 +30,50 @@ interface ITranslateEngine {
     singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption>;
     branchTranslate(options: Array<TranslateConfigOption>): Promise<Array<TranslateResponseOption>>;
 }
+declare class TranslateEngineInstance$1 implements ITranslateEngine {
+    private _engine;
+    constructor(enine: ITranslateEngine);
+    singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption>;
+    branchTranslate(options: TranslateConfigOption[]): Promise<TranslateResponseOption[]>;
+    translate(options: TranslateConfigOption | TranslateConfigOption[]): Promise<TranslateResponseOption> | Promise<TranslateResponseOption[]>;
+}
+/**
+ * 语言词典库——单项词典信息
+ */
+interface localMapItemInfo {
+    src: string;
+    srcText: string;
+    target: string;
+    targetText: string;
+    weight?: number;
+}
 
 interface PluginDefaultConfiguraOption {
     engine: ITranslateEngine;
+}
+
+interface HtmlPluginDefaultConfigOption extends PluginDefaultConfiguraOption {
+    el: string;
+}
+declare class HtmlPlugin {
+    private _engine;
+    private _el;
+    private _options;
+    constructor(options: HtmlPluginDefaultConfigOption);
+    get engine(): TranslateEngineInstance$1;
+    get options(): HtmlPluginDefaultConfigOption;
+    get el(): HTMLElement;
+    watchDom(): void;
+    translate(options: TranslateDefaultConfiguraOption): void;
+}
+
+interface VuePluginDefaultConfigOption extends HtmlPluginDefaultConfigOption {
+    global?: boolean;
+}
+declare class VuePlugin {
+    private _plugin;
+    constructor(options: VuePluginDefaultConfigOption);
+    translate(options: TranslateDefaultConfiguraOption): void;
 }
 
 declare enum DeeplxLanguage$1 {
@@ -63,18 +94,6 @@ declare class DeeplxTranslateEngine$1 implements ITranslateEngine {
     private http;
     constructor(options: DeeplxDefaultConfiguraOption);
     /**
-     * 根据配置信息获取本地语言映射表映射标识
-     * @param options 配置信息
-     * @returns
-     */
-    private getLocalTranslateLanguageMapKeyByOption;
-    /**
-     * 根据key获取本地语言映射表信息
-     * @param key 映射标识 格式：[srcource language]-[target language]
-     * @returns
-     */
-    private getLocalTranslateLanguageMapInfoByKey;
-    /**
      * 发送翻译请求
      * @param text 需要翻译的文本
      * @param src 源语言
@@ -82,20 +101,6 @@ declare class DeeplxTranslateEngine$1 implements ITranslateEngine {
      * @returns
      */
     private requestTranslate;
-    /**
-     * 根据本地语言映射表标记原始文本
-     * @param localLanguageMapInfo
-     * @param info
-     * @returns
-     */
-    encodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, info: TranslateConfigOption): TranslateConfigOption;
-    /**
-     * 根据本地语言映射表解析翻译结果
-     * @param key 映射标识
-     * @param responseText 翻译响应结果文本
-     * @returns
-     */
-    decodeTranslateMapping(localLanguageMapInfo: Array<LanguageMapItemInfo>, responseText: string): string;
     /**
      * 单个翻译
      * @param options
@@ -120,15 +125,25 @@ declare const _default: {
     DeeplxTranslateEngine: typeof DeeplxTranslateEngine$1;
     DeeplxLanguage: typeof DeeplxLanguage$1;
     TranslateVuePlugin: {
-        install(app: any, options: PluginDefaultConfiguraOption): void;
+        install(app: any, options: VuePluginDefaultConfigOption): void;
+        create(options: VuePluginDefaultConfigOption): VuePlugin;
     };
+    TranslateHTMLPlugin: {
+        create(options: HtmlPluginDefaultConfigOption): HtmlPlugin;
+    };
+    TranslateEngineInstance: typeof TranslateEngineInstance$1;
 };
 
 declare const DeeplxTranslateEngine: typeof DeeplxTranslateEngine$1;
 declare const DeeplxLanguage: typeof DeeplxLanguage$1;
 declare const TranslateVuePlugin: {
-    install(app: any, options: PluginDefaultConfiguraOption): void;
+    install(app: any, options: VuePluginDefaultConfigOption): void;
+    create(options: VuePluginDefaultConfigOption): VuePlugin;
+};
+declare const TranslateEngineInstance: typeof TranslateEngineInstance$1;
+declare const TranslateHTMLPlugin: {
+    create(options: HtmlPluginDefaultConfigOption): HtmlPlugin;
 };
 
-export { DeeplxLanguage, DeeplxTranslateEngine, TranslateVuePlugin, _default as default };
+export { DeeplxLanguage, DeeplxTranslateEngine, TranslateEngineInstance, TranslateHTMLPlugin, TranslateVuePlugin, _default as default };
 //# sourceMappingURL=index.d.ts.map
