@@ -18,5 +18,5 @@ engine
         text: "你好世界"
     })
     .then((res) => {
-        console.log("---翻译结果", res.data);
+        console.log("---翻译结果", res);
     });

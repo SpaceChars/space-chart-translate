@@ -1,4 +1,4 @@
-import XHRAdapter from './xhrAdapter';
+
 import NodeHttpAdapter from './nodeHttpAdpater'
 
 /**
@@ -69,7 +69,7 @@ export class HttpClientInstance implements IHttpClient {
   }
 
   request<T>(options: HttpClientRequestOption): Promise<HtptClientResponseOption<T>> {
-    // const adapter = typeof XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
+
     const adapter = new NodeHttpAdapter();
     return adapter.send<T>(Object.assign(this.defaultOption, options))
   }
