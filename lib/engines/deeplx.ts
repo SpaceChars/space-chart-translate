@@ -45,7 +45,6 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
   }
 
 
-
   /**
    * 发送翻译请求
    * @param text 需要翻译的文本
@@ -73,7 +72,6 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
       }
     })
   }
-
 
 
   /**

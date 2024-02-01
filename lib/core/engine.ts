@@ -47,7 +47,6 @@ export class TranslateEngineInstance implements ITranslateEngine {
   singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption> {
     return this._engine.singleTranslate(options)
   }
-
   branchTranslate(options: TranslateConfigOption[]): Promise<TranslateResponseOption[]> {
     return this._engine.branchTranslate(options)
   }
