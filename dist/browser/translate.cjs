@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // @spacechart/translate  v1.0.1 Copyright (c) 2024 2388160949@qq.com and contributors
 'use strict';
 
@@ -98,11 +97,6 @@ class TranslateLocalMapping {
     }
 }
 
-=======
-// @spacechart/translate  v1.0.0 Copyright (c) 2024 2388160949@qq.com and contributors
-'use strict';
-
->>>>>>> master
 var global$1 = (typeof global !== "undefined" ? global :
   typeof self !== "undefined" ? self :
   typeof window !== "undefined" ? window : {});
@@ -6953,10 +6947,6 @@ class HttpClientInstance {
         return this.request(Object.assign(this.defaultOption, options, { url, method: HttpClientRequestMethod.POST, data }));
     }
     request(options) {
-<<<<<<< HEAD
-=======
-        // const adapter = typeof XMLHttpRequest !== 'undefined' ? new XHRAdapter() : new NodeHttpAdapter();
->>>>>>> master
         const adapter = new NodeHttpAdapter();
         return adapter.send(Object.assign(this.defaultOption, options));
     }
@@ -6980,15 +6970,6 @@ class DeeplxTranslateEngine {
         if (!options.authorization) {
             throw new Error('The deeplx request token cannot be emptry');
         }
-<<<<<<< HEAD
-=======
-        if (!options.src) {
-            throw new Error('The source language cannot be emptry');
-        }
-        if (!options.target) {
-            throw new Error('The target language cannot be emptry');
-        }
->>>>>>> master
         this.src = options.src || DeeplxLanguage.ZH;
         this.target = options.target || DeeplxLanguage.EN;
         this.languageMap = options.languageMap || {};
@@ -6999,29 +6980,6 @@ class DeeplxTranslateEngine {
         });
     }
     /**
-<<<<<<< HEAD
-=======
-     * 根据配置信息获取本地语言映射表映射标识
-     * @param options 配置信息
-     * @returns
-     */
-    getLocalTranslateLanguageMapKeyByOption(options) {
-        return `${options.src || this.src}-${options.target || this.target}`;
-    }
-    /**
-     * 根据key获取本地语言映射表信息
-     * @param key 映射标识 格式：[srcource language]-[target language]
-     * @returns
-     */
-    getLocalTranslateLanguageMapInfoByKey(key) {
-        return (this.languageMap[key] || []).sort((v1, v2) => {
-            const width1 = v1.weight == undefined ? 0 : v1.weight;
-            const width2 = v2.weight == undefined ? 0 : v2.weight;
-            return width2 - width1;
-        });
-    }
-    /**
->>>>>>> master
      * 发送翻译请求
      * @param text 需要翻译的文本
      * @param src 源语言
@@ -7029,15 +6987,12 @@ class DeeplxTranslateEngine {
      * @returns
      */
     requestTranslate(text, src, target) {
-<<<<<<< HEAD
         if (!src) {
             throw new Error('The source language cannot be emptry');
         }
         if (!target) {
             throw new Error('The target language cannot be emptry');
         }
-=======
->>>>>>> master
         return this.http.post(this.url, {
             "text": text,
             "source_lang": src || this.src,
@@ -7049,36 +7004,6 @@ class DeeplxTranslateEngine {
         });
     }
     /**
-<<<<<<< HEAD
-=======
-     * 根据本地语言映射表标记原始文本
-     * @param localLanguageMapInfo
-     * @param info
-     * @returns
-     */
-    encodeTranslateMapping(localLanguageMapInfo, info) {
-        info = JSON.parse(JSON.stringify(info));
-        let text = info.text || '';
-        localLanguageMapInfo.forEach((map, index) => {
-            text = text.replace(map.src, '${' + index + '}');
-        });
-        info.text = text;
-        return info;
-    }
-    /**
-     * 根据本地语言映射表解析翻译结果
-     * @param key 映射标识
-     * @param responseText 翻译响应结果文本
-     * @returns
-     */
-    decodeTranslateMapping(localLanguageMapInfo, responseText) {
-        localLanguageMapInfo.forEach((item, index) => {
-            responseText = responseText.replace('${' + index + '}', item.target);
-        });
-        return responseText;
-    }
-    /**
->>>>>>> master
      * 单个翻译
      * @param options
      */
@@ -7094,7 +7019,6 @@ class DeeplxTranslateEngine {
                     success: false
                 });
             }
-<<<<<<< HEAD
             const localMapControl = new TranslateLocalMapping((options.languageMap || this.languageMap || []));
             const _options = localMapControl.changeKey(options.src || this.src, options.target || this.target).encode(options);
             this.requestTranslate(_options.text || '', _options.src || '', _options.target || '').then((res) => {
@@ -7102,15 +7026,6 @@ class DeeplxTranslateEngine {
                 resolve(res.code == 200 && ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) ? {
                     alternatives: (res.data || {}).alternatives || null,
                     data: localMapControl.decode(((_b = res.data) === null || _b === void 0 ? void 0 : _b.data) || ''),
-=======
-            const targetLanguageMapInfo = this.getLocalTranslateLanguageMapInfoByKey(this.getLocalTranslateLanguageMapKeyByOption(options));
-            const _options = this.encodeTranslateMapping(targetLanguageMapInfo, options);
-            this.requestTranslate(_options.text || '', _options.src, _options.target).then((res) => {
-                var _a, _b;
-                resolve(res.code == 200 && ((_a = res.data) === null || _a === void 0 ? void 0 : _a.data) ? {
-                    alternatives: (res.data || {}).alternatives || null,
-                    data: this.decodeTranslateMapping(targetLanguageMapInfo, ((_b = res.data) === null || _b === void 0 ? void 0 : _b.data) || ''),
->>>>>>> master
                     id: options.id || '',
                     success: true
                 } : {
@@ -7148,7 +7063,6 @@ class DeeplxTranslateEngine {
     }
 }
 
-<<<<<<< HEAD
 class HtmlPlugin {
     constructor(options) {
         this._options = options;
@@ -7253,32 +7167,13 @@ var TranslateVuePlugin = {
         return new VuePlugin(options);
     }
 };
-=======
-class TranslateEngineInstance {
-    constructor(enine) {
-        this._engine = enine;
-    }
-    singleTranslate(options) {
-        return this._engine.singleTranslate(options);
-    }
-    branchTranslate(options) {
-        return this._engine.branchTranslate(options);
-    }
-    translate(options) {
-        return this._engine.translate(options);
-    }
-}
->>>>>>> master
 
 // this module should only have a default export
 var translate = {
     DeeplxTranslateEngine,
     DeeplxLanguage,
-<<<<<<< HEAD
     TranslateVuePlugin,
     TranslateHTMLPlugin,
-=======
->>>>>>> master
     TranslateEngineInstance
 };
 
