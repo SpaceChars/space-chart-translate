@@ -1,4 +1,6 @@
+
 import { ITranslateEngine, localMapItemInfo, TranslateConfigOption, TranslateDefaultConfiguraOption, TranslateLocalMapping, TranslateResponseOption } from "../core/engine";
+
 import { HttpClient, HttpClientInstance } from "../http/adapter";
 
 export enum DeeplxLanguage {
@@ -53,6 +55,7 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
    * @returns 
    */
   private requestTranslate(text: string, src: DeeplxLanguage | string, target: DeeplxLanguage | string) {
+
     if (!src) {
       throw new Error('The source language cannot be emptry')
     }
@@ -72,6 +75,7 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
       }
     })
   }
+
 
 
   /**
