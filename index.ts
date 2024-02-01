@@ -1,5 +1,5 @@
 
-// This module is intended to unwrap Axios default export as named.
+// This module is intended to unwrap translate default export as named.
 
 import Translate from './lib/core/translate'
 
