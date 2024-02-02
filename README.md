@@ -1,21 +1,148 @@
-# @SpaceChart/Translate
+<h2 align="center">
+    <br/>
+    <b>@SpaceChart/Translate</b>
+    <br/>
+</h2>
 
-## 关于
+<br/>
 
-> `@SpaceChart/Translate` 是一个可配置的翻译插件，适用于任何环境，让开发者不再需要注重插件本身\
-> \
-> 内置引擎： Deeplx（`DeeplxTranslateEngine`）\
-> 内置翻译插件：HTML（`TranslateHTMLPlugin`）、VUE（`TranslateVuePlugin`）\
-> \
-> 代码已开源（[GitHub](https://github.com/SpaceChars/space-chart-translate)）,欢迎有想法的小伙伴们一起共建
+<p align="center">
+@SpaceChart/Translate 是一个可配置的翻译插件，适用于任何环境，让开发者不再需要注重插件本身
+</p>
 
-## 翻译引擎
+<br/>
 
-> 开发者可以通过`ITranslateEngine`翻译引擎接口自定义实现翻译逻辑，也可以使用内置的翻译引擎（Deeplx）
+<p align="center">
+Engines： Deeplx（DeeplxTranslateEngine）
+</p>
+<p align="center">
+Plugins：HTML（TranslateHTMLPlugin）、VUE（TranslateVuePlugin）
+</p>
 
-### 内置引擎
+<br/>
 
-#### Deeplx
+<div align="center">
+
+[![npm version](https://img.shields.io/npm/v/@spacechart/translate.svg?style=flat-square)](https://www.npmjs.org/package/@spacechart/translate)
+[![install size](https://img.shields.io/badge/dynamic/json?url=https://packagephobia.com/v2/api.json?p=@spacechart/translate&query=$.install.pretty&label=install%20size&style=flat-square)](https://packagephobia.now.sh/result?p=@spacechart/translate)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@spacechart/translate?style=flat-square)](https://bundlephobia.com/package/@spacechart/translate@latest)
+[![npm downloads](https://img.shields.io/npm/dm/@spacechart/translate.svg?style=flat-square)](https://npm-stat.com/charts.html?package=@spacechart/translate)
+[![Known Vulnerabilities](https://snyk.io/test/npm/@spacechart/translate/badge.svg)](https://snyk.io/test/npm/@spacechart/translate)
+
+</div>
+
+<br/>
+
+## Table of Contents
+
+- [Browser Support](#browser-support)
+- [Installing](#installing)
+    - [Package manager](#package-manager)
+    - [CDN](#cdn)
+- [Create Your first translate project](#create-your-first-translate-project)
+    - [Initialize Node.js project](#initialize-nodejs-project)
+    - [Install dependencies](#install-dependencies)
+    - [Introducing dependencies](#introducing-dependencies)
+- [Translate engines](#translate-engines)
+    - [Deeplx](#deeplx)
+    - [Custom Engine](#custom-engine)
+    - [TranslateEngineInstance Class](#translateengineinstance-class)
+- [Extention Plugins](#extention-plugins)
+    - [Vue Plugin](#vue-plugin)
+    - [HTML Plugin](#html-plugin)
+- [Future](#future)
+
+## Browser Support
+
+![Chrome](https://raw.githubusercontent.com/alrra/browser-logos/main/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.githubusercontent.com/alrra/browser-logos/main/src/firefox/firefox_48x48.png) | ![Safari](https://raw.githubusercontent.com/alrra/browser-logos/main/src/safari/safari_48x48.png) | ![Opera](https://raw.githubusercontent.com/alrra/browser-logos/main/src/opera/opera_48x48.png) | ![Edge](https://raw.githubusercontent.com/alrra/browser-logos/main/src/edge/edge_48x48.png) | ![IE](https://raw.githubusercontent.com/alrra/browser-logos/master/src/archive/internet-explorer_9-11/internet-explorer_9-11_48x48.png) |
+--- | --- | --- | --- | --- | --- |
+Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 11 × |
+
+## Installing
+
+### Package manager
+
+Using npm:
+
+```bash
+$ npm install @spacechart/translate
+```
+
+Using bower:
+
+```bash
+$ bower install @spacechart/translate
+```
+
+Using yarn:
+
+```bash
+$ yarn add @spacechart/translate
+```
+
+Using pnpm:
+
+```bash
+$ pnpm add @spacechart/translate
+```
+
+### CDN
+
+Using jsDelivr CDN (ES5 UMD browser module):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@spacechart/translate@1.0.1/dist/translate.min.js"></script>
+```
+
+Using unpkg CDN:
+
+```html
+<script src="https://unpkg.com/@spacechart/translate@1.0.1/dist/translate.min.js"></script>
+```
+
+## Create Your first translate project
+
+### Initialize Node.js project
+
+```shell
+node init -y
+```
+
+### Install dependencies
+
+```shell
+npm install @spacechart/translate
+```
+
+### Introducing dependencies
+
+```js
+const { DeeplxTranslateEngine, TranslateEngineInstance } = require("@spacechart/translate");
+
+const engine = new TranslateEngineInstance(
+    new DeeplxTranslateEngine({
+        //...
+    })
+);
+
+engine
+    .translate({
+        text: "你好世界"
+    })
+    .then((res) => {
+        console.log("---翻译结果", res.data);
+    });
+```
+
+
+## Translate engines
+
+开发者可以通过实现 `ITranslateEngine` 接口创建[自定义翻译引擎](#custom-engine)，也可以使用内置的翻译引擎，比如Deeplx（`DeeplxTranslateEngine`）
+
+
+### Deeplx
+
+实现类：DeeplxTranslateEngine
 
 ```js
 const { DeeplxTranslateEngine, DeeplxLanguage } = require("@spacechart/translate");
@@ -34,7 +161,9 @@ engine
     });
 ```
 
-### 自定义引擎
+### Custom Engine
+
+接口类：ITranslateEngine
 
 ```js
 export class MyTranslateEngine implements ITranslateEngine {
@@ -63,9 +192,9 @@ enine.translate({
 });
 ```
 
-### `TranslateEngineInstance`
+### TranslateEngineInstance Class
 
-> 除了使用对应的翻译引擎类外，插件还提供了`TranslateEngineInstance`类，它同样继承了`ITranslateEngine`接口，`TranslateEngineInstance` 通过多态的概念，让开发者可以随意的更换引擎，而不用更改已编写的代码（如下）
+除了使用对应的翻译引擎类外，插件还提供了`TranslateEngineInstance`类，它同样继承了`ITranslateEngine`接口，`TranslateEngineInstance` 通过多态的特点，让开发者可以随意的更换引擎，而不用更改已编写的代码（如下）
 
 ```js
 const { DeeplxTranslateEngine, TranslateEngineInstance } = require("@spacechart/translate");
@@ -89,30 +218,30 @@ enine
     });
 ```
 
-## 扩展插件
+## Extention Plugins
 
-### Vue 扩展插件
+### Vue Plugin
 
-> Vue 插件通过`TranslateVuePlugin`类创建使用，支持`v-not-translate`指令排除需要翻译的文本（如下）
+Vue 插件通过`TranslateVuePlugin`类创建使用，支持`v-not-translate`指令排除需要翻译的文本（如下）
 
 #### Options
 
-> `VuePluginDefaultConfigOption`
+属性类 `VuePluginDefaultConfigOption`
 
-| 字段     | 是否必填 | 类型               | 描述                                       |
-| -------- | -------- | ------------------ | ------------------------------------------ |
-| `engine` | 是       | `ITranslateEngine` | 翻译引擎                                   |
-| `el`     | 否       | `string`           | 需要翻译的顶级节点                         |
-| `global` | 否       | `boolean`          | 是否全局注入`$t`全局插件变量 ，默认`false` |
+| 字段| 是否必填 | 类型| 描述|
+| ---- | ---- | ---- | ---- |
+| `engine` | 是 | `ITranslateEngine` | 翻译引擎 |
+| `el`     | 否 | `string`           | 需要翻译的顶级节点|
+| `global` | 否 | `boolean`          | 是否全局注入`$t`全局插件变量 ，默认`false` |
 
 #### Methods
 
-| 方法名                                                     | 描述                          |
-| ---------------------------------------------------------- | ----------------------------- |
+| 方法名 | 描述 
+| ---- | ---- |
 | `install(app: any, options: VuePluginDefaultConfigOption)` | `Vue.directive`注册指令时使用 |
 | `create(options: VuePluginDefaultConfigOption) `           | 创建 `VuePlugin` 插件使用     |
 
-#### 案例
+#### Example
 
 ##### 1. main.js
 
@@ -184,26 +313,26 @@ new Vue({
 </script>
 ```
 
-### `HTML` 扩展插件
+### HTML Plugin
 
-> `HTML` 插件通过`TranslateHTMLPlugin`类创建使用，支持`not-translate`属性排除需要翻译的文本（如下）
+`HTML` 插件通过`TranslateHTMLPlugin`类创建使用，支持`not-translate`属性排除需要翻译的文本（如下）
 
 #### Options
 
-> `HtmlPluginDefaultConfigOption`
+属性类：`HtmlPluginDefaultConfigOption`
 
-| 字段     | 是否必填 | 类型               | 描述               |
-| -------- | -------- | ------------------ | ------------------ |
-| `engine` | 是       | `ITranslateEngine` | 翻译引擎           |
-| `el`     | 否       | `string`           | 需要翻译的顶级节点 |
+| 字段| 是否必填 | 类型| 描述|
+| ---- | ---- | ---- | ---- |
+| `engine` | 是| `ITranslateEngine` | 翻译引擎|
+| `el`     | 否 | `string`           | 需要翻译的顶级节点 |
 
 #### Methods
 
-| 方法名                                           | 描述                       |
-| ------------------------------------------------ | -------------------------- |
+| 方法名 | 描述 |
+| ---- | ---- |
 | `create(options: HtmlPluginDefaultConfigOption)` | 创建 `HtmlPlugin` 插件使用 |
 
-#### 案例
+#### Example
 
 ##### index.html
 
@@ -238,36 +367,6 @@ new Vue({
 </html>
 ```
 
-## 制作第一个 Translate 项目
+## Future
 
-### 1. 初始化项目
-
-```shell
-node init -y
-```
-
-### 2. 安装依赖
-
-```shell
-npm install @spacechart/translate
-```
-
-### 配置项目
-
-```js
-const { DeeplxTranslateEngine, TranslateEngineInstance } = require("@spacechart/translate");
-
-const engine = new TranslateEngineInstance(
-    new DeeplxTranslateEngine({
-        //...
-    })
-);
-
-engine
-    .translate({
-        text: "你好世界"
-    })
-    .then((res) => {
-        console.log("---翻译结果", res.data);
-    });
-```
+欢迎有共建想法的小伙伴加入到开源生态中
