@@ -7,7 +7,8 @@
 <br/>
 
 <p align="center">
-@SpaceChart/Translate 是一个可配置的翻译插件，适用于任何环境，让开发者不再需要注重插件本身
+@SpaceChart/Translate 是一个可配置的翻译插件，适用于任何环境，让开发者不再需要注重插件本身；插件支持自定义翻译引擎，快速生成对应的AI翻译模型客户端插件
+
 </p>
 
 <br/>
@@ -50,6 +51,8 @@ Plugins：HTML（TranslateHTMLPlugin）、VUE（TranslateVuePlugin）
 - [Extention Plugins](#extention-plugins)
     - [Vue Plugin](#vue-plugin)
     - [HTML Plugin](#html-plugin)
+
+- [FAQ](#faq)
 - [Future](#future)
 
 ## Browser Support
@@ -195,6 +198,17 @@ enine.translate({
 ### TranslateEngineInstance Class
 
 除了使用对应的翻译引擎类外，插件还提供了`TranslateEngineInstance`类，它同样继承了`ITranslateEngine`接口，`TranslateEngineInstance` 通过多态的特点，让开发者可以随意的更换引擎，而不用更改已编写的代码（如下）
+
+#### Methods
+
+|方法|描述|
+|----|----|
+|`translate(options:any):Promise<any>`| 通用翻译：传入`TranslateConfigOption[]`=>`Promise<TranslateResponseOption[]>`；传入`TranslateConfigOption`=>`Promise<TranslateResponseOption>`|
+|`singleTranslate(options: TranslateConfigOption): Promise<TranslateResponseOption>`|单个翻译|
+|`branchTranslate(options: TranslateConfigOption[]): Promise<TranslateResponseOption[]>`|批量翻译|
+
+
+#### Example
 
 ```js
 const { DeeplxTranslateEngine, TranslateEngineInstance } = require("@spacechart/translate");
@@ -344,7 +358,8 @@ new Vue({
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
-        <script src="../../dist//translate.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@spacechart/translate@1.0.1/dist/translate.min.js"></script>
+
     </head>
     <body>
         <div id="app">你好</div>
@@ -367,6 +382,34 @@ new Vue({
 </html>
 ```
 
+## FAQ
+
+#### [Vue 3.0] TypeError: Cannot read properties of undefined (reading '$t')
+
+原因：在Vue 3.0 `setup`组合式函数中不能直接使用`this`对象来调用`app.config.globalProperties`配置的属性（在选项式中可以使用`this`直接访问）
+
+解决方案：通过`getCurrentInstance`方法获取，如下
+
+```html
+<script setup>
+import { onMounted, getCurrentInstance } from "vue";
+
+onMounted(() => {
+      getCurrentInstance().proxy.$t.translate({
+        src: "EN",
+        target: "ZH"
+    });
+});
+</script>
+```
+
+#### [BUG] Uncaught (in promise) TypeError: this._mapList.forEach is not a function
+
+原因：在版本 v1.0.0 和 v1.0.1 中Deeplx引擎代码逻辑问题，导致默认值赋值错误
+
+解决方案：省级版本至1.0.2及以上
+
 ## Future
 
 欢迎有共建想法的小伙伴加入到开源生态中
+

@@ -37,7 +37,7 @@ export class DeeplxTranslateEngine implements ITranslateEngine {
 
     this.src = options.src || DeeplxLanguage.ZH
     this.target = options.target || DeeplxLanguage.EN
-    this.languageMap = options.languageMap || {}
+    this.languageMap = options.languageMap
 
     this.url = options.url;
     this.authorization = options.authorization;
