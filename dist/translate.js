@@ -1,4 +1,4 @@
-// @spacechart/translate  v1.0.1 Copyright (c) 2024 2388160949@qq.com and contributors
+// @spacechart/translate  v1.0.2 Copyright (c) 2024 2388160949@qq.com and contributors
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -6976,7 +6976,7 @@
             }
             this.src = options.src || DeeplxLanguage.ZH;
             this.target = options.target || DeeplxLanguage.EN;
-            this.languageMap = options.languageMap || {};
+            this.languageMap = options.languageMap;
             this.url = options.url;
             this.authorization = options.authorization;
             this.http = HttpClient.create({

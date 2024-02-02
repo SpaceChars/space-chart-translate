@@ -1,4 +1,4 @@
-// @spacechart/translate  v1.0.1 Copyright (c) 2024 2388160949@qq.com and contributors
+// @spacechart/translate  v1.0.2 Copyright (c) 2024 2388160949@qq.com and contributors
 class TranslateEngineInstance$1 {
     constructor(enine) {
         this._engine = enine;
@@ -6970,7 +6970,7 @@ class DeeplxTranslateEngine$1 {
         }
         this.src = options.src || DeeplxLanguage$1.ZH;
         this.target = options.target || DeeplxLanguage$1.EN;
-        this.languageMap = options.languageMap || {};
+        this.languageMap = options.languageMap;
         this.url = options.url;
         this.authorization = options.authorization;
         this.http = HttpClient.create({
@@ -7175,7 +7175,7 @@ const Translate = {
     TranslateEngineInstance: TranslateEngineInstance$1
 };
 
-// This module is intended to unwrap Axios default export as named.
+// This module is intended to unwrap translate default export as named.
 const { DeeplxTranslateEngine, DeeplxLanguage, TranslateVuePlugin, TranslateEngineInstance, TranslateHTMLPlugin } = Translate;
 
 export { DeeplxLanguage, DeeplxTranslateEngine, TranslateEngineInstance, TranslateHTMLPlugin, TranslateVuePlugin, Translate as default };
