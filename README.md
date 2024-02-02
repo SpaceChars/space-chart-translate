@@ -8,6 +8,7 @@
 
 <p align="center">
 @SpaceChart/Translate 是一个可配置的翻译插件，适用于任何环境，让开发者不再需要注重插件本身；插件支持自定义翻译引擎，快速生成对应的AI翻译模型客户端插件
+
 </p>
 
 <br/>
@@ -50,6 +51,7 @@ Plugins：HTML（TranslateHTMLPlugin）、VUE（TranslateVuePlugin）
 - [Extention Plugins](#extention-plugins)
     - [Vue Plugin](#vue-plugin)
     - [HTML Plugin](#html-plugin)
+
 - [FAQ](#faq)
 - [Future](#future)
 
@@ -357,6 +359,7 @@ new Vue({
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Document</title>
         <script src="https://cdn.jsdelivr.net/npm/@spacechart/translate@1.0.1/dist/translate.min.js"></script>
+
     </head>
     <body>
         <div id="app">你好</div>
@@ -409,3 +412,4 @@ onMounted(() => {
 ## Future
 
 欢迎有共建想法的小伙伴加入到开源生态中
+
