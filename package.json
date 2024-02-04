@@ -1,6 +1,6 @@
 {
     "name": "@spacechart/translate",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Space Chart translate",
     "main": "./dist/esm/translate.js",
     "type": "module",

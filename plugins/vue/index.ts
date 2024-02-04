@@ -13,8 +13,12 @@ export class VuePlugin {
     this._plugin = TranslateHTMLPugin.create(options)
   }
 
+  get htmlPlugin() {
+    return this._plugin
+  }
+
   translate(options: TranslateDefaultConfiguraOption) {
-    this._plugin.translate(options)
+    return this._plugin.translate(options)
   }
 }
 

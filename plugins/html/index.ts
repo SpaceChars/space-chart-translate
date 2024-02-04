@@ -66,10 +66,11 @@ export class HtmlPlugin {
       })
     })
 
-    this._engine.branchTranslate(requestList).then(res => {
+    return this._engine.branchTranslate(requestList).then(res => {
       res.forEach(info => {
         textNodes[Number(info.id)].textContent = info.data
       })
+      return res
     })
   }
 }
